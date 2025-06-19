@@ -15,7 +15,7 @@
     {
       "name": "Boifubá",
       "url": "https://banestorm.rolandodados.com.br",
-      "discord": "Boifubá#6083"
+      "discord": "boifuba"
     }
   ],
   "esmodules": [
@@ -42,14 +42,7 @@
       "flags": {}
     }
   ],
-  "relationships": {
-    "systems": [
-      {
-        "id": "gurps",
-        "type": "system",
-        "compatibility": {}
-      }
-    ]
+  "relationships": {  
   },
   "languages": [
     {
@@ -59,8 +52,8 @@
     }
   ],
   "socket": false,
-  "url": "",
-  "manifest": "",
-  "download": "",
+  "url": "https://rolandodados.com.br",
+  "manifest": "https://raw.githubusercontent.com/Boifuba/mookinator/refs/tags/download/module.json",
+  "download": "https://github.com/Boifuba/mookinator/archive/refs/tags/download.zip",
   "license": "MIT"
 }
