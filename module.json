@@ -42,7 +42,14 @@
       "flags": {}
     }
   ],
-  "relationships": {  
+  "relationships": {
+    "systems": [
+      {
+        "id": "gurps",
+        "type": "system",
+        "compatibility": {}
+      }
+    ]
   },
   "languages": [
     {
