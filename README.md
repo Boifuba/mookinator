@@ -1,33 +1,62 @@
 # Mookinator
 
-Módulo personalizado para Foundry VTT com funcionalidades avançadas.
+##  How to Use the Module (GURPS NPC Generation)
 
-## Instalação
+This module was created to make it easier to generate NPCs (like guards, bandits, cultists, etc.) for GURPS campaigns in Foundry VTT — any scenario.
 
-1. No Foundry VTT, vá em "Add-on Modules"
-2. Clique em "Install Module"
-3. Cole a URL do manifest: `[URL do seu manifest.json]`
-4. Clique em "Install"
+###  Steps
 
-## Funcionalidades
+1. **Create a base character in GCS**  
+   In **GURPS Character Sheet (GCS)**, build a character sheet with all the *possible options* your NPC type might use:
+   - Add around 10 weapons the NPC **could** use.
+   - Add any spells they **might** have access to (if applicable).
+   - Add a variety of traits (positive or negative) to represent **personality**.
+   - Include a list of skills to represent **general knowledge** or background.
 
-- [Descreva as funcionalidades do seu módulo aqui]
+2. **Import the character into the module**  
+   Save the `.gcs` file and import it into Foundry VTT using this module.
 
-## Configuração
+3. **Configure generation parameters**  
+   After importing, you'll be able to define:
+   - **Minimum and maximum** values for the attributes (ST, DX, IQ, HT).
+   - How many **skills** the NPC will get.
+   - How many **weapons** they will actively use.
+   - How many **traits** will be randomly selected.
 
-Acesse as configurações do módulo em:
-- **Game Settings** → **Configure Settings** → **Module Settings** → **Mookinator**
+4. **Randomize your NPC (MOOC)**  
+   Click the generate button and voilà! A random NPC will be created using the options and constraints you set.
+
+5. **Edit with GGA (GURPS Generic Assistant)**  
+   The generated NPC can be further edited using the **MOOC** tool inside **GGA**, allowing for fine-tuning and adjustments.
+
+
+##  Installation
+
+In Foundry VTT:
+
+1. Go to **"Add-on Modules"**.
+2. Click **"Install Module"**.
+3. Paste the manifest URL: 
+
+<pre>https://raw.githubusercontent.com/Boifuba/mookinator/refs/heads/main/module.json  </pre>
+4. Click **"Install"**.
+
+
+
+
+
 
 ## Estrutura do Projeto
 
 ```
 mookinator/
-├── module.json          # Manifest do módulo
+├── module.json         # Manifest do módulo
 ├── README.md           # Documentação
 ├── scripts/            # Arquivos JavaScript
 │   ├── main.js         # Arquivo principal
+│   ├──        # Configurações
 │   ├── config.js       # Configurações
-│   └── utils.js        # Utilitários
+│   ├── config.js       # Configurações
 ├── styles/             # Arquivos CSS
 │   └── mookinator.css  # Estilos principais
 └── lang/               # Localizações
@@ -46,3 +75,8 @@ Para desenvolver este módulo:
 ## Licença
 
 MIT License
+
+
+
+
+dx+ht/4

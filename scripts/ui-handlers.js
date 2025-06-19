@@ -252,7 +252,7 @@ function setupGenerateButtonHandler(html, gerarMook, getCurrentMookData) {
 }
 
 /**
- * Extract configuration from form elements
+ * Extract configuration from form elements - UPDATED: Changed parry to shield
  * @param {HTMLFormElement} form - The form element
  * @returns {Object} Configuration object
  */
@@ -286,8 +286,8 @@ function extractFormConfig(form) {
     traitsQty: getInt("traitsQty", 5),
   };
 
-  // Add all attributes to config
-  const attributes = ['st', 'dx', 'iq', 'ht', 'hp', 'will', 'per', 'fp', 'parry', 'speed', 'move', 'sm', 'dr', 'dodge', 'coins'];
+  // Add all attributes to config - UPDATED: Changed parry to shield
+  const attributes = ['st', 'dx', 'iq', 'ht', 'hp', 'will', 'per', 'fp', 'shield', 'speed', 'move', 'sm', 'dr', 'dodge', 'coins'];
   attributes.forEach(attr => {
     config[attr + 'Min'] = getInt(attr + 'Min', 10);
     config[attr + 'Max'] = getInt(attr + 'Max', 20);

@@ -9,7 +9,7 @@
 /* Hero Section with Dark Background */
 .form-title { 
   text-align: center; 
-  margin: 0 0 20px 0; 
+  margin: 0 0 10px 0; 
   font-size: 20px; 
   font-weight: bold; 
   background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
@@ -26,7 +26,6 @@
   font-size: 14px; 
   font-weight: 600; 
   margin-top: 10px;
-
 }
 
 .mook-form-container { 
@@ -39,7 +38,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 15px; 
+  margin-bottom: 10px; 
 }
 
 .saved-class-buttons {
@@ -70,8 +69,8 @@
   cursor: pointer; 
   transition: all 0.2s ease; 
   overflow: hidden; 
-    border: 2px groove var(--color-border-light-highlight);
-      background-color: #333;
+  border: 2px groove var(--color-border-light-highlight);
+  background-color: #333;
 }
 
 .class-btn:hover { 
@@ -107,7 +106,7 @@
   background-color: transparent;
 }
 
-/* Special styling for the + symbol in custom button */
+
 .custom-btn .class-name {
   position: static;
   transform: none;
@@ -120,7 +119,6 @@
   max-width: none;
 }
 
-/* FoundryVTT Style Buttons - Sober Colors */
 .action-buttons-group-top {
   display: flex;
   justify-content: center;
@@ -145,29 +143,64 @@
   border: 1px solid #ddd;
 }
 
-.mook-form { 
-  display: flex; 
-  gap: 8px; 
-  flex-wrap: wrap; 
-  background: rgba(0,0,0,0.02);
-  border-radius: 6px;
-  border: 1px solid #ddd;
+
+.mook-form {
+    display: flex
+;
+    gap: 9px;
+    flex-wrap: wrap;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 6px;
+    position: relative;
+    margin-top: 25px;
+    justify-content: center;
 }
 
+
+.attributes-section-title {
+  position: absolute;
+      position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    /* font-weight: 600; */
+    /* color: #4b4b4b; */
+    font-size: 14px;
+    text-transform: uppercase;
+    /* letter-spacing: 0.5px; */
+    /* background: #f8f8f8; */
+    padding: 8px 15px;
+    /* border: 1px solid #ddd; */
+    /* border-radius: 4px; */
+    
+}
 .column { 
   display: flex; 
   flex-direction: column; 
   flex-shrink: 0; 
   min-width: 110px; 
+  position: relative;
 }
 
 .column-label { 
-  font-weight: 600; 
+
   margin-bottom: 6px; 
-  color: #4b4b4b; 
   font-size: 12px; 
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* Column headers for - and + signs */
+.column-header {
+  font-size: 14px;
+  text-align: right;
+  margin-bottom: 6px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: right; 
+  background: rgba(0,0,0,0.05);
+
 }
 
 .input-row { 
@@ -180,11 +213,11 @@
 /* Fixed width for attribute labels to prevent pushing */
 .input-label { 
   font-weight: 500; 
-  width: 35px; /* Fixed width instead of min-width */
+  width: 35px;
   font-size: 10px; 
   color: #666;
   text-align: left;
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0;
 }
 
 /* FoundryVTT Native Style Inputs */
@@ -195,7 +228,6 @@
   border-radius: 3px; 
   font-size: 11px; 
   text-align: center; 
-  /* background: #fff; */
   color: #191813;
   font-family: inherit;
 }
@@ -214,7 +246,7 @@
 
 .vertical-section { 
   flex-basis: 100%; 
-  padding-top: 15px; 
+  padding-top: 10px; 
   border-top: 2px solid #ccc; 
   display: flex; 
   flex-wrap: wrap; 
@@ -257,35 +289,34 @@
 
 .textinho {
   display: flex;
-  justify-content: center !important; /* Alinha no eixo horizontal */
-  align-items: center !important;      /* Alinha no eixo vertical */
-  font-size: small ;
-  font-style: italic ;
+  justify-content: center !important;
+  align-items: center !important;
+  font-size: small;
+  font-style: italic;
   text-align: center !important;
-  width: 20px;              /* Largura total do container */
-  height: 100px;            /* Altura qualquer pra demonstrar */
+  width: 20px;
+  height: 100px;
 }
+
 /* FoundryVTT Style Buttons - Sober Theme */
 .generate-btn, .save-class-btn, .load-selected-btn, .delete-selected-btn { 
- order: 2px groove var(--color-border-light-highlight);
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: all 0.2s ease;
-    color: #191813;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    font-family: inherit;
-    background-color: rgba(0, 0, 0, 0.1);
+  border: 2px groove var(--color-border-light-highlight);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  color: #191813;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  font-family: inherit;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .generate-btn {
-  width: 100% !important; /* Full width as requested */
+  width: 100% !important;
   font-size: 14px;
   padding: 10px;
   line-height: 1.2;
 }
-
-
 
 .save-class-btn, .load-selected-btn, .delete-selected-btn {
   min-width: 90px;

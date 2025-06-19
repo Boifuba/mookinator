@@ -94,16 +94,17 @@ function generateDialogTemplate(savedClassButtonsHtml, customButtonHtml) {
         </div>
         <div class="selected-class-title"></div>
         <form id="mook-form" class="mook-form">
+          <div class="attributes-section-title">Attributes</div>
           <div class="column">
-            <label class="column-label">Atributos:</label>
+<div class="column-header">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;&nbsp;&nbsp</div>
             ${generateAttributeInputs(['st', 'dx', 'iq', 'ht', 'coins'])}
           </div>
           <div class="column">
-            <label class="column-label">&nbsp;</label>
-            ${generateAttributeInputs(['hp', 'will', 'per', 'fp', 'parry'])}
+<div class="column-header">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;&nbsp;&nbsp;</div>
+            ${generateAttributeInputs(['hp', 'will', 'per', 'fp', 'shield'])}
           </div>
           <div class="column">
-            <label class="column-label">&nbsp;</label>
+<div class="column-header">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
             ${generateAttributeInputs(['speed', 'move', 'sm', 'dr', 'dodge'], "/")}
           </div>
           <div class="vertical-section">

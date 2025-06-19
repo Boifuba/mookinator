@@ -27,7 +27,6 @@ function setCurrentMookDataAndPath(data, path, title, imageUrl) {
     imageUrl: imageUrl
   };
   
-  console.log("🪙 Dados de moeda garantidos:", currentMookData?.currency);
 }
 
 /**
@@ -48,13 +47,43 @@ window.setCurrentMookDataAndPath = setCurrentMookDataAndPath;
 window.currentSelectedClassData = currentSelectedClassData;
 
 /**
+ * Generate random number within range (inclusive)
+ * @param {number} min - Minimum value
+ * @param {number} max - Maximum value
+ * @returns {number} Random integer between min and max
+ */
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Generate random floating point number within range
+ * @param {number} min - Minimum value
+ * @param {number} max - Maximum value
+ * @param {number} decimals - Number of decimal places (default: 2)
+ * @returns {number} Random float between min and max
+ */
+function randomFloat(min, max, decimals = 2) {
+  const random = Math.random() * (max - min) + min;
+  return parseFloat(random.toFixed(decimals));
+}
+
+/**
+ * Round to nearest quarter (0.25 increments)
+ * @param {number} value - Value to round
+ * @returns {number} Value rounded to nearest 0.25
+ */
+function roundToQuarter(value) {
+  return Math.round(value * 4) / 4;
+}
+
+/**
  * Distribute coins among different currency types - SIMPLIFIED
  * @param {number} totalValue - Total value to distribute
  * @param {Array} currencyData - Array of currency objects
  * @returns {string} Formatted coin distribution string
  */
 function distributeCoins(totalValue, currencyData) {
-  console.log("🪙 Distribuindo moedas - Valor total:", totalValue, "Dados de moeda:", currencyData);
   
   if (!currencyData || !Array.isArray(currencyData) || totalValue <= 0) {
     console.warn("⚠️ Dados de moeda inválidos ou valor zero");
@@ -95,12 +124,10 @@ function distributeCoins(totalValue, currencyData) {
       const capitalizedName = currency.name.charAt(0).toUpperCase() + currency.name.slice(1);
       result.push(`${capitalizedName} Coins; ${quantity}; $${totalCost}; ${totalCurrencyWeight.toFixed(2)} ${currency.unit}`);
       
-      console.log(`🪙 ${capitalizedName}: ${quantity} moedas, valor $${totalCost}`);
     }
   });
 
   const finalResult = result.length > 0 ? result.join('\n') : "No coins";
-  console.log("🪙 Resultado final da distribuição:", finalResult);
   return finalResult;
 }
 
@@ -120,21 +147,128 @@ function preencherCampo(textareaKey, content) {
 }
 
 /**
- * Fill attributes with random values - SIMPLIFIED
+ * Fill attributes with calculated values - UPDATED WITH SHIELD AND SPEED LOGIC
  * @param {Object} config - Configuration object with min/max values
  */
 function preencherAtributos(config) {
   const mookApp = Object.values(ui.windows).find(w => w.title?.includes("Mook Generator"));
   if (!mookApp) return;
 
-  const attributes = ["st", "dx", "iq", "ht", "hp", "will", "per", "fp", "parry", "speed", "move", "sm", "dr", "dodge", "coins"];
+
+  // Step 1: Calculate base attributes first (ST, DX, IQ, HT)
+  const baseAttributes = {};
   
-  attributes.forEach(attr => {
+  // Calculate ST, DX, IQ, HT as random values within their ranges
+  ['st', 'dx', 'iq', 'ht'].forEach(attr => {
     const minValue = config[attr + 'Min'];
     const maxValue = config[attr + 'Max'];
     
     if (typeof minValue === "number" && typeof maxValue === "number" && maxValue >= minValue) {
-      const val = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
+      const val = randomInt(minValue, maxValue);
+      baseAttributes[attr] = val;
+      
+      // Update min/max fields in form
+      mookApp.element.find(`input[name="${attr}Min"]`).val(minValue);
+      mookApp.element.find(`input[name="${attr}Max"]`).val(maxValue);
+      
+      // Set the calculated value
+      mookApp.element.find(`input[data-key="${attr}"]`).val(val).trigger("change");
+      
+    }
+  });
+
+  // Step 2: Calculate dependent attributes
+  
+  // HP = ST + random value from HP range
+  if (baseAttributes.st && typeof config.hpMin === "number" && typeof config.hpMax === "number") {
+    const hpModifier = randomInt(config.hpMin, config.hpMax);
+    const hpValue = baseAttributes.st + hpModifier;
+    
+    mookApp.element.find(`input[name="hpMin"]`).val(config.hpMin);
+    mookApp.element.find(`input[name="hpMax"]`).val(config.hpMax);
+    mookApp.element.find(`input[data-key="hp"]`).val(hpValue).trigger("change");
+    
+  }
+
+  // Will = IQ + random value from Will range
+  if (baseAttributes.iq && typeof config.willMin === "number" && typeof config.willMax === "number") {
+    const willModifier = randomInt(config.willMin, config.willMax);
+    const willValue = baseAttributes.iq + willModifier;
+    
+    mookApp.element.find(`input[name="willMin"]`).val(config.willMin);
+    mookApp.element.find(`input[name="willMax"]`).val(config.willMax);
+    mookApp.element.find(`input[data-key="will"]`).val(willValue).trigger("change");
+    
+  }
+
+  // Per = IQ + random value from Per range
+  if (baseAttributes.iq && typeof config.perMin === "number" && typeof config.perMax === "number") {
+    const perModifier = randomInt(config.perMin, config.perMax);
+    const perValue = baseAttributes.iq + perModifier;
+    
+    mookApp.element.find(`input[name="perMin"]`).val(config.perMin);
+    mookApp.element.find(`input[name="perMax"]`).val(config.perMax);
+    mookApp.element.find(`input[data-key="per"]`).val(perValue).trigger("change");
+    
+  }
+
+  // FP = HT + random value from FP range
+  if (baseAttributes.ht && typeof config.fpMin === "number" && typeof config.fpMax === "number") {
+    const fpModifier = randomInt(config.fpMin, config.fpMax);
+    const fpValue = baseAttributes.ht + fpModifier;
+    
+    mookApp.element.find(`input[name="fpMin"]`).val(config.fpMin);
+    mookApp.element.find(`input[name="fpMax"]`).val(config.fpMax);
+    mookApp.element.find(`input[data-key="fp"]`).val(fpValue).trigger("change");
+    
+  }
+
+  // UPDATED: Speed = (DX + HT) / 4 + random float from Speed range, rounded to 0.25
+  if (baseAttributes.dx && baseAttributes.ht && typeof config.speedMin === "number" && typeof config.speedMax === "number") {
+    const baseSpeed = (baseAttributes.dx + baseAttributes.ht) / 4;
+    const speedModifier = randomFloat(config.speedMin, config.speedMax, 2);
+    const rawSpeedValue = baseSpeed + speedModifier;
+    const speedValue = roundToQuarter(rawSpeedValue); // Round to nearest 0.25
+    
+    mookApp.element.find(`input[name="speedMin"]`).val(config.speedMin);
+    mookApp.element.find(`input[name="speedMax"]`).val(config.speedMax);
+    mookApp.element.find(`input[data-key="speed"]`).val(speedValue).trigger("change");
+    
+    
+    // Move = integer part of Speed
+    const moveValue = Math.floor(speedValue);
+    mookApp.element.find(`input[name="moveMin"]`).val(config.moveMin || 0);
+    mookApp.element.find(`input[name="moveMax"]`).val(config.moveMax || 0);
+    mookApp.element.find(`input[data-key="move"]`).val(moveValue).trigger("change");
+    
+    
+    // Dodge = integer part of Speed + 3
+    const dodgeValue = moveValue + 3;
+    mookApp.element.find(`input[name="dodgeMin"]`).val(config.dodgeMin || 0);
+    mookApp.element.find(`input[name="dodgeMax"]`).val(config.dodgeMax || 0);
+    mookApp.element.find(`input[data-key="dodge"]`).val(dodgeValue).trigger("change");
+    
+  }
+
+  // UPDATED: Shield - no calculation, just random value from range
+  if (typeof config.shieldMin === "number" && typeof config.shieldMax === "number") {
+    const shieldValue = randomInt(config.shieldMin, config.shieldMax);
+    
+    mookApp.element.find(`input[name="shieldMin"]`).val(config.shieldMin);
+    mookApp.element.find(`input[name="shieldMax"]`).val(config.shieldMax);
+    mookApp.element.find(`input[data-key="shield"]`).val(shieldValue).trigger("change");
+    
+  }
+
+  // Step 3: Handle remaining attributes that don't change calculation (dr, coins)
+  const unchangedAttributes = ["dr", "coins"];
+  
+  unchangedAttributes.forEach(attr => {
+    const minValue = config[attr + 'Min'];
+    const maxValue = config[attr + 'Max'];
+    
+    if (typeof minValue === "number" && typeof maxValue === "number" && maxValue >= minValue) {
+      const val = randomInt(minValue, maxValue);
       
       // Update min/max fields in form
       mookApp.element.find(`input[name="${attr}Min"]`).val(minValue);
@@ -142,14 +276,25 @@ function preencherAtributos(config) {
 
       // Special handling for coins
       if (attr === "coins") {
-        console.log("🪙 Processando moedas - Valor:", val, "Dados de moeda disponíveis:", currentMookData?.currency);
         const coinDistribution = distributeCoins(val, currentMookData?.currency);
         preencherCampo("equipment", coinDistribution);
       }
       
       mookApp.element.find(`input[data-key="${attr}"]`).val(val).trigger("change");
+      
     }
   });
+
+  // Step 4: Handle SM separately (it might have different logic)
+  if (typeof config.smMin === "number" && typeof config.smMax === "number") {
+    const smValue = randomInt(config.smMin, config.smMax);
+    
+    mookApp.element.find(`input[name="smMin"]`).val(config.smMin);
+    mookApp.element.find(`input[name="smMax"]`).val(config.smMax);
+    mookApp.element.find(`input[data-key="sm"]`).val(smValue).trigger("change");
+    
+  }
+
 }
 
 /**
@@ -265,10 +410,8 @@ async function gerarMook(config, mookData) {
     return;
   }
 
-  console.log("🎯 Iniciando geração do Mook...");
-  console.log("🪙 Dados de moeda disponíveis:", mookData?.currency);
 
-  // Fill attributes first (including ST)
+  // Fill attributes first (including ST) with new calculation logic
   preencherAtributos(config);
   
   // Small delay to ensure fields are updated
@@ -300,7 +443,6 @@ async function gerarMook(config, mookData) {
     preencherCampo('notes', mookData.notes.join('\n'));
   }
 
-  console.log("✅ Geração do Mook concluída!");
 }
 
 /**
@@ -359,7 +501,7 @@ async function inicializarMookGenerator() {
 
 // Module initialization
 Hooks.once("init", () => {
-  console.log("Mookinator | Módulo inicializado");
+  console.log("Mookinator | Initializing Mookinator module...");
   
   game.settings.register("mookinator", "savedClasses", {
     name: "Saved Classes",
@@ -376,6 +518,6 @@ Hooks.once("init", () => {
 });
 
 Hooks.once("ready", () => {
-  console.log("Mookinator | Módulo pronto para uso");
+  console.log("Mookinator | Module ready to use!");
   ui.notifications.info("Mookinator carregado! Use game.mookinator.inicializarMookGenerator() em uma macro.");
 });

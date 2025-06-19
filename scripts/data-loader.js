@@ -154,7 +154,7 @@ function processGCSData(gcsData) {
     will: createDefaultRange(10, 15),
     per: createDefaultRange(10, 15),
     fp: createDefaultRange(10, 15),
-    parry: createDefaultRange(8, 12),
+    shield: createDefaultRange(8, 12), // UPDATED: Changed from parry to shield
     speed: createDefaultRange(5, 8),
     move: createDefaultRange(5, 8),
     sm: createDefaultRange(0, 2),
@@ -247,8 +247,8 @@ function extractCurrentFormConfig(html) {
     return isNaN(val) ? fallback : val;
   };
 
-  // Extract attributes configuration
-  const attributes = ['st', 'dx', 'iq', 'ht', 'hp', 'will', 'per', 'fp', 'parry', 'speed', 'move', 'sm', 'dr', 'dodge', 'coins'];
+  // Extract attributes configuration - UPDATED: Changed parry to shield
+  const attributes = ['st', 'dx', 'iq', 'ht', 'hp', 'will', 'per', 'fp', 'shield', 'speed', 'move', 'sm', 'dr', 'dodge', 'coins'];
   const atributos = {};
   attributes.forEach(attr => {
     atributos[attr] = {
