@@ -1,0 +1,10 @@
+{
+  "mookinator": {
+    "title": "Mookinator",
+    "description": "Gerador avançado de Mooks para Foundry VTT",
+    "notifications": {
+      "loaded": "Mookinator carregado com sucesso!",
+      "error": "Erro no Mookinator"
+    }
+  }
+}

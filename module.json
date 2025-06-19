@@ -1,0 +1,66 @@
+{
+  "id": "mookinator",
+  "title": "Mookinator",
+  "description": "Módulo personalizado para Foundry VTT com funcionalidades avançadas",
+  
+  "version": "1.0.0",
+  "library": "false",
+
+  "compatibility": {
+    "minimum": "11",
+    "verified": "13",
+    "maximum": "13"  
+  },
+  "authors": [
+    {
+      "name": "Boifubá",
+      "url": "https://banestorm.rolandodados.com.br",
+      "discord": "Boifubá#6083"
+    }
+  ],
+  "esmodules": [
+    "scripts/main.js",
+    "scripts/utils.js",
+    "scripts/templates.js",
+    "scripts/ui-handlers.js",
+    "scripts/data-loader.js"
+  ],
+  "styles": [
+    "styles/mookinator.css"
+  ],
+  "packs": [
+    {
+      "name": "mookinator",
+      "label": "Mookinator",
+      "path": "packs/mookinator",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "gurps",
+      "flags": {}
+    }
+  ],
+  "relationships": {
+    "systems": [
+      {
+        "id": "gurps",
+        "type": "system",
+        "compatibility": {}
+      }
+    ]
+  },
+  "languages": [
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "lang/pt-BR.json"
+    }
+  ],
+  "socket": false,
+  "url": "",
+  "manifest": "",
+  "download": "",
+  "license": "MIT"
+}

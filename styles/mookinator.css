@@ -1,0 +1,421 @@
+/* Mookinator Module Styles - FoundryVTT Sober Theme */
+
+.container-mook { 
+  margin: 0 auto; 
+  max-width: 800px; 
+  font-family: 'Signika', sans-serif;
+}
+
+/* Hero Section with Dark Background */
+.form-title { 
+  text-align: center; 
+  margin: 0 0 20px 0; 
+  font-size: 20px; 
+  font-weight: bold; 
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  color: #f0f0f0;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  border: 1px solid #444;
+}
+
+.selected-class-title { 
+  text-align: center; 
+  font-size: 14px; 
+  font-weight: 600; 
+  margin-top: 10px;
+
+}
+
+.mook-form-container { 
+  display: flex; 
+  flex-direction: column; 
+}
+
+/* Class Buttons - Grouped on Left */
+.class-buttons { 
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px; 
+}
+
+.saved-class-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 6px; 
+}
+
+.no-saved-classes {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 15px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 4px;
+  margin: 0;
+  border: 1px solid #ddd;
+}
+
+.class-btn { 
+  position: relative; 
+  height: 80px; 
+  width: 80px; 
+  border-radius: 4px; 
+  background-size: cover; 
+  background-position: center; 
+  cursor: pointer; 
+  transition: all 0.2s ease; 
+  overflow: hidden; 
+    border: 2px groove var(--color-border-light-highlight);
+      background-color: #333;
+}
+
+.class-btn:hover { 
+  border-color: #999 !important; 
+  transform: translateY(-1px); 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3); 
+}
+
+.class-btn.selected { 
+  border-color: #44ac44 !important; 
+  border-width: 3px !important; 
+  box-shadow: 0 0 8px rgba(68, 172, 68, 0.4);
+}
+
+.class-name { 
+  position: absolute; 
+  bottom: 4px; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  color: white; 
+  font-weight: 600; 
+  font-size: 11px; 
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.9); 
+  z-index: 1; 
+  max-width: 90%;
+  text-align: center;
+}
+
+.custom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+}
+
+/* Special styling for the + symbol in custom button */
+.custom-btn .class-name {
+  position: static;
+  transform: none;
+  font-size: 32px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+  bottom: auto;
+  left: auto;
+  max-width: none;
+}
+
+/* FoundryVTT Style Buttons - Sober Colors */
+.action-buttons-group-top {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-buttons-group-bottom {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.loading-indicator { 
+  display: none; 
+  text-align: center; 
+  padding: 15px; 
+  font-size: 14px; 
+  color: #666; 
+  background: rgba(0,0,0,0.05); 
+  border-radius: 4px; 
+  margin-bottom: 15px; 
+  border: 1px solid #ddd;
+}
+
+.mook-form { 
+  display: flex; 
+  gap: 8px; 
+  flex-wrap: wrap; 
+  background: rgba(0,0,0,0.02);
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.column { 
+  display: flex; 
+  flex-direction: column; 
+  flex-shrink: 0; 
+  min-width: 110px; 
+}
+
+.column-label { 
+  font-weight: 600; 
+  margin-bottom: 6px; 
+  color: #4b4b4b; 
+  font-size: 12px; 
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-row { 
+  display: flex; 
+  align-items: center; 
+  gap: 4px; 
+  margin: 2px 0; 
+}
+
+/* Fixed width for attribute labels to prevent pushing */
+.input-label { 
+  font-weight: 500; 
+  width: 35px; /* Fixed width instead of min-width */
+  font-size: 10px; 
+  color: #666;
+  text-align: left;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* FoundryVTT Native Style Inputs */
+.input-field { 
+  width: 32px; 
+  padding: 3px 6px; 
+  border: 1px solid #a0a0a0; 
+  border-radius: 3px; 
+  font-size: 11px; 
+  text-align: center; 
+  /* background: #fff; */
+  color: #191813;
+  font-family: inherit;
+}
+
+.input-field:focus { 
+  outline: none; 
+  border-color: #ff6400; 
+  box-shadow: 0 0 3px rgba(255, 100, 0, 0.25); 
+}
+
+.separator { 
+  font-size: 12px; 
+  color: #999; 
+  font-weight: 500;
+}
+
+.vertical-section { 
+  flex-basis: 100%; 
+  padding-top: 15px; 
+  border-top: 2px solid #ccc; 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 15px; 
+}
+
+.section-group { 
+  margin-bottom: 10px; 
+  flex: 1 1 calc(20% - 12px); 
+  min-width: 140px; 
+}
+
+/* Special styling for traits section to accommodate textarea */
+.traits-section {
+  flex: 1 1 calc(40% - 12px);
+  min-width: 280px;
+}
+
+.section-label { 
+  font-weight: 600; 
+  margin-bottom: 6px; 
+  color: #4b4b4b; 
+  font-size: 12px; 
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.section-inputs { 
+  display: flex; 
+  align-items: center; 
+  gap: 4px; 
+  flex-wrap: wrap; 
+}
+
+.section-input-label { 
+  font-size: 10px; 
+  color: #777;
+  font-weight: 500;
+}
+
+.textinho {
+  display: flex;
+  justify-content: center !important; /* Alinha no eixo horizontal */
+  align-items: center !important;      /* Alinha no eixo vertical */
+  font-size: small ;
+  font-style: italic ;
+  text-align: center !important;
+  width: 20px;              /* Largura total do container */
+  height: 100px;            /* Altura qualquer pra demonstrar */
+}
+/* FoundryVTT Style Buttons - Sober Theme */
+.generate-btn, .save-class-btn, .load-selected-btn, .delete-selected-btn { 
+ order: 2px groove var(--color-border-light-highlight);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    color: #191813;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    font-family: inherit;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.generate-btn {
+  width: 100% !important; /* Full width as requested */
+  font-size: 14px;
+  padding: 10px;
+  line-height: 1.2;
+}
+
+
+
+.save-class-btn, .load-selected-btn, .delete-selected-btn {
+  min-width: 90px;
+}
+
+.save-class-btn:hover, .load-selected-btn:hover, .delete-selected-btn:hover { 
+  background: linear-gradient(to bottom, #fff 0%, #f0f0f0 100%);
+  border-color: #666;
+}
+
+.save-class-btn:active, .load-selected-btn:active, .delete-selected-btn:active,
+.generate-btn:active {
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+  transform: translateY(1px);
+}
+
+/* Save Class Dialog Styles - PROPERLY ALIGNED */
+.save-class-dialog .form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.save-class-dialog .form-group label {
+  width: 90px;
+  text-align: right;
+  font-weight: 600;
+  color: #4b4b4b;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.save-class-dialog .form-group input[type="text"] {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #a0a0a0;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #191813;
+  font-family: inherit;
+}
+
+.save-class-dialog .form-group input[type="text"]:focus {
+  outline: none;
+  border-color: #ff6400;
+  box-shadow: 0 0 3px rgba(255, 100, 0, 0.25);
+}
+
+.save-class-dialog .input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.save-class-dialog .input-row input[type="text"] {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #a0a0a0;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #191813;
+  font-family: inherit;
+}
+
+.save-class-dialog .input-row input[type="text"]:focus {
+  outline: none;
+  border-color: #ff6400;
+  box-shadow: 0 0 3px rgba(255, 100, 0, 0.25);
+}
+
+/* BROWSE BUTTON - SMALL ICON ONLY */
+.save-class-dialog .browse-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #a0a0a0;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.save-class-dialog .browse-btn:hover {
+  border-color: #666;
+}
+
+.save-class-dialog .browse-btn:active {
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+  transform: translateY(1px);
+}
+
+/* Dialog styling improvements */
+.mookinator-dialog {
+  font-family: 'Signika', sans-serif;
+}
+
+.mookinator-dialog .dialog-content {
+  padding: 20px;
+  background: #f8f8f8;
+}
+
+.mookinator-dialog .dialog-buttons {
+  text-align: center;
+  padding-top: 15px;
+  border-top: 1px solid #ccc;
+  background: #f0f0f0;
+}
+
+/* Focus and accessibility improvements */
+.class-btn:focus,
+.generate-btn:focus,
+.save-class-btn:focus,
+.load-selected-btn:focus,
+.delete-selected-btn:focus {
+  outline: 2px solid #ff6400;
+  outline-offset: 2px;
+}
+
+/* Subtle animations */
+.class-btn,
+.generate-btn,
+.save-class-btn,
+.load-selected-btn,
+.delete-selected-btn {
+  transition: all 0.15s ease-in-out;
+}
