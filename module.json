@@ -4,7 +4,7 @@
   "description": "Módulo personalizado para Foundry VTT com funcionalidades avançadas",
   
   "version": "1.0.0",
-  "library": "false",
+  "library": false,
 
   "compatibility": {
     "minimum": "11",
@@ -20,10 +20,12 @@
   ],
   "esmodules": [
     "scripts/main.js",
-    "scripts/utils.js",
     "scripts/templates.js",
     "scripts/ui-handlers.js",
-    "scripts/data-loader.js"
+    "scripts/data-loader.js",
+    "scripts/mook-form-operations.js",
+    "scripts/mook-state.js",
+    "scripts/mook-utils.js"
   ],
   "styles": [
     "styles/mookinator.css"

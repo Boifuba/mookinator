@@ -22,6 +22,66 @@ function cleanValue(val) {
 }
 
 /**
+ * Infer base damage type from weapon usage
+ * @param {string} usage - Weapon usage string
+ * @returns {string} Inferred base damage type ('sw' or 'thr')
+ */
+function inferBaseDamageType(usage) {
+  if (!usage) return 'sw'; // Default to swing
+  
+  const usageLower = usage.toLowerCase();
+  
+  // Thrust-based attacks
+  if (usageLower.includes('thrust') || 
+      usageLower.includes('stab') || 
+      usageLower.includes('pierce') ||
+      usageLower.includes('point')) {
+    return 'thr';
+  }
+  
+  // Default to swing for most weapons
+  return 'sw';
+}
+
+/**
+ * Check if equipment is a shield based on tags
+ * @param {Array} tags - Equipment tags array
+ * @returns {boolean} True if equipment is a shield
+ */
+function isShield(tags) {
+  if (!tags || !Array.isArray(tags)) return false;
+  
+  return tags.some(tag => 
+    tag.toLowerCase().includes('shield') || 
+    tag.toLowerCase().includes('buckler')
+  );
+}
+
+/**
+ * Extract shield DB value from equipment
+ * @param {Object} equip - Equipment object
+ * @returns {number} Shield DB value or 0
+ */
+function extractShieldDB(equip) {
+  // Try different possible locations for shield DB value
+  if (equip.dr && typeof equip.dr === 'number') {
+    return equip.dr;
+  }
+  
+  if (equip.db && typeof equip.db === 'number') {
+    return equip.db;
+  }
+  
+  // Check if there's a defensive bonus in the equipment
+  if (equip.defensive_bonus && typeof equip.defensive_bonus === 'number') {
+    return equip.defensive_bonus;
+  }
+  
+  // Default shield DB if none found
+  return 2;
+}
+
+/**
  * Load mook data from JSON file
  * @param {string} jsonPath - Path to the JSON file
  * @returns {Promise<Object|null>} Mook data object or null if error
@@ -73,7 +133,7 @@ function loadFileFromBrowser() {
 }
 
 /**
- * Process GCS file data and convert to Mookinator format
+ * Process GCS file data and convert to Mookinator format - UPDATED WITH SHIELD PROCESSING
  * @param {Object} gcsData - Raw GCS JSON data
  * @returns {Object} Processed mook data in Mookinator format
  */
@@ -94,7 +154,7 @@ function processGCSData(gcsData) {
   const skillsList = extractList(gcsData.skills);
   const spellsList = extractList(gcsData.spells);
 
-  // Extract weapons with enhanced data
+  // Extract weapons with enhanced data and damage type inference
   const meleeSkills = [];
   const rangedSkills = [];
 
@@ -109,6 +169,9 @@ function processGCSData(gcsData) {
         };
 
         if (isRangedWeapon(equip.tags)) {
+          // Add inferred base damage type for ranged weapons
+          const inferredType = inferBaseDamageType(weapon.usage);
+          
           rangedSkills.push({
             ...weaponData,
             acc: cleanValue(weapon.accuracy),
@@ -116,26 +179,43 @@ function processGCSData(gcsData) {
             recoil: cleanValue(weapon.recoil),
             range: cleanValue(weapon.range),
             shots: cleanValue(weapon.shots),
-            bulk: cleanValue(weapon.bulk)
+            bulk: cleanValue(weapon.bulk),
+            inferredBaseDamageType: inferredType
           });
         } else {
           const existente = meleeSkills.find(w => w.nome === weaponData.nome);
+          
+          // Add inferred base damage type for melee attacks
+          const inferredType = inferBaseDamageType(weapon.usage);
+          
           const attack = {
             dano: weaponData.dano,
             usage: weaponData.usage,
             reach: cleanValue(weapon.reach),
             parry: cleanValue(weapon.parry),
             st: weaponData.st,
-            block: cleanValue(weapon.block)
+            block: cleanValue(weapon.block),
+            inferredBaseDamageType: inferredType
           };
 
           if (existente) {
             existente.attacks.push(attack);
           } else {
-            meleeSkills.push({
+            // UPDATED: Check if this equipment is a shield
+            const newMeleeSkill = {
               nome: weaponData.nome,
               attacks: [attack]
-            });
+            };
+
+            // Add shield-specific properties if this is a shield
+            if (isShield(equip.tags)) {
+              console.log(`🛡️ Processando escudo: ${equip.description}`);
+              newMeleeSkill.shield = true;
+              newMeleeSkill.db = extractShieldDB(equip);
+              console.log(`🛡️ Escudo ${equip.description} com DB: ${newMeleeSkill.db}`);
+            }
+
+            meleeSkills.push(newMeleeSkill);
           }
         }
       });
@@ -466,5 +546,8 @@ window.MookinatorDataLoader = {
   getSavedClasses,
   ensureDefaultCurrency,
   cleanValue,
+  inferBaseDamageType,
+  isShield,
+  extractShieldDB,
   DEFAULT_CURRENCY_DATA
 };

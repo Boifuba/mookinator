@@ -17,7 +17,7 @@ function setupClassSelectionHandler(html, loadCustomJSONHandler) {
     
     // Store selected class data globally
     if ($(this).hasClass("saved-class-btn")) {
-      window.currentSelectedClassData = {
+      window.MookinatorState.currentSelectedClassData = {
         id: $(this).data("id"),
         path: $(this).data("path"),
         title: $(this).data("name"),
@@ -25,10 +25,10 @@ function setupClassSelectionHandler(html, loadCustomJSONHandler) {
       };
       
       // Update selected class title
-      html.find(".selected-class-title").text(`Mook selected: ${window.currentSelectedClassData.title}`);
+      html.find(".selected-class-title").text(`Mook selected: ${window.MookinatorState.currentSelectedClassData.title}`);
     } else if ($(this).hasClass("custom-btn")) {
       // Handle custom JSON/GCS loading
-      window.currentSelectedClassData = null;
+      window.MookinatorState.currentSelectedClassData = null;
       html.find(".selected-class-title").text("Carregando arquivo...");
       
       // Use the provided handler function
@@ -47,18 +47,18 @@ function setupClassSelectionHandler(html, loadCustomJSONHandler) {
 function setupGlobalLoadDeleteButtons(html, deleteClassHandler) {
   // Handle load selected button
   html.find("#load-selected-btn").on("click", () => {
-    if (!window.currentSelectedClassData) {
+    if (!window.MookinatorState.currentSelectedClassData) {
       ui.notifications.warn("Nenhuma Mook selected. Selecione uma classe primeiro.");
       return;
     }
 
     // Find the complete class data from saved classes
     const savedClasses = window.MookinatorDataLoader.getSavedClasses();
-    const classData = savedClasses.find(cls => cls.id === window.currentSelectedClassData.id);
+    const classData = savedClasses.find(cls => cls.id === window.MookinatorState.currentSelectedClassData.id);
     
     if (classData) {
       // Use the function to populate form from saved data
-      window.MookinatorDataLoader.populateFormFromSavedData(html, classData, window.setCurrentMookDataAndPath);
+      window.MookinatorDataLoader.populateFormFromSavedData(html, classData, window.MookinatorState.setCurrentMookDataAndPath);
     } else {
       ui.notifications.error("Dados da classe não encontrados.");
     }
@@ -66,12 +66,12 @@ function setupGlobalLoadDeleteButtons(html, deleteClassHandler) {
 
   // Handle delete selected button
   html.find("#delete-selected-btn").on("click", () => {
-    if (!window.currentSelectedClassData) {
+    if (!window.MookinatorState.currentSelectedClassData) {
       ui.notifications.warn("Nenhuma Mook selected. Selecione uma classe primeiro.");
       return;
     }
 
-    const classData = window.currentSelectedClassData;
+    const classData = window.MookinatorState.currentSelectedClassData;
     
     // Show confirmation dialog
     Dialog.confirm({
@@ -83,7 +83,7 @@ function setupGlobalLoadDeleteButtons(html, deleteClassHandler) {
           html.find(`.saved-class-btn[data-id="${classData.id}"]`).remove();
           
           // Clear current selection
-          window.currentSelectedClassData = null;
+          window.MookinatorState.currentSelectedClassData = null;
           html.find(".selected-class-title").text("");
           
           // Check if no more saved classes exist
@@ -154,9 +154,9 @@ function setupSaveButtonHandler(html, saveClassHandler, getCurrentMookData) {
 
             // CRITICAL FIX: Use existing ID if we're updating an existing class
             let classId;
-            if (window.currentSelectedClassData && window.currentSelectedClassData.id) {
+            if (window.MookinatorState.currentSelectedClassData && window.MookinatorState.currentSelectedClassData.id) {
               // We're updating an existing class - use the existing ID
-              classId = window.currentSelectedClassData.id;
+              classId = window.MookinatorState.currentSelectedClassData.id;
             } else {
               // We're creating a new class - generate a new ID
               classId = foundry.utils.randomID();
@@ -172,7 +172,7 @@ function setupSaveButtonHandler(html, saveClassHandler, getCurrentMookData) {
 
             if (saveClassHandler(classData)) {
               // Update the current selected class data to reflect the saved class
-              window.currentSelectedClassData = {
+              window.MookinatorState.currentSelectedClassData = {
                 id: classData.id,
                 path: classData.path,
                 title: classData.title,
