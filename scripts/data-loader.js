@@ -78,7 +78,6 @@ function loadFileFromBrowser() {
  * @returns {Object} Processed mook data in Mookinator format
  */
 function processGCSData(gcsData) {
-  console.log("🔄 Processando dados GCS...", gcsData);
 
   // Function to check if it's a ranged weapon
   const isRangedWeapon = (tags) => tags && tags.includes('Missile Weapon');
@@ -181,7 +180,6 @@ function processGCSData(gcsData) {
     currency: gcsData.currency || DEFAULT_CURRENCY_DATA
   };
 
-  console.log("✅ Dados GCS processados:", processedData);
   return processedData;
 }
 
@@ -194,7 +192,6 @@ function ensureDefaultCurrency(mookData) {
   if (!mookData) return null;
   
   if (!mookData.currency || !Array.isArray(mookData.currency) || mookData.currency.length === 0) {
-    console.log("🪙 Adicionando dados de moeda padrão...");
     mookData.currency = [...DEFAULT_CURRENCY_DATA];
   }
   
@@ -360,7 +357,6 @@ async function loadCustomJSON(html, setCurrentMookDataCallback) {
     let mookData, title, imageUrl;
 
     if (fileType === 'GCS') {
-      console.log("🎯 Detectado arquivo GCS, processando...");
       mookData = processGCSData(rawData);
       title = mookData.title;
       imageUrl = mookData.imageUrl;

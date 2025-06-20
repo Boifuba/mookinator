@@ -46,22 +46,6 @@ In Foundry VTT:
 
 
 
-## Estrutura do Projeto
-
-```
-mookinator/
-├── module.json         # Manifest do módulo
-├── README.md           # Documentação
-├── scripts/            # Arquivos JavaScript
-│   ├── main.js         # Arquivo principal
-│   ├──        # Configurações
-│   ├── config.js       # Configurações
-│   ├── config.js       # Configurações
-├── styles/             # Arquivos CSS
-│   └── mookinator.css  # Estilos principais
-└── lang/               # Localizações
-    └── pt-BR.json      # Português brasileiro
-```
 
 ## Desenvolvimento
 
@@ -79,4 +63,7 @@ MIT License
 
 
 
-dx+ht/4
+## TODO
+
+- se a janela do mook não tiver aberta abrir 
+- verificar se tem um valor em shield se tiver obrigatoria escolher um shield ignorando o numero de armas. 

@@ -27,6 +27,7 @@ function setCurrentMookDataAndPath(data, path, title, imageUrl) {
     imageUrl: imageUrl
   };
   
+  console.log("🪙 Dados de moeda garantidos:", currentMookData?.currency);
 }
 
 /**
@@ -84,6 +85,7 @@ function roundToQuarter(value) {
  * @returns {string} Formatted coin distribution string
  */
 function distributeCoins(totalValue, currencyData) {
+  console.log("🪙 Distribuindo moedas - Valor total:", totalValue, "Dados de moeda:", currencyData);
   
   if (!currencyData || !Array.isArray(currencyData) || totalValue <= 0) {
     console.warn("⚠️ Dados de moeda inválidos ou valor zero");
@@ -124,10 +126,12 @@ function distributeCoins(totalValue, currencyData) {
       const capitalizedName = currency.name.charAt(0).toUpperCase() + currency.name.slice(1);
       result.push(`${capitalizedName} Coins; ${quantity}; $${totalCost}; ${totalCurrencyWeight.toFixed(2)} ${currency.unit}`);
       
+      console.log(`🪙 ${capitalizedName}: ${quantity} moedas, valor $${totalCost}`);
     }
   });
 
   const finalResult = result.length > 0 ? result.join('\n') : "No coins";
+  console.log("🪙 Resultado final da distribuição:", finalResult);
   return finalResult;
 }
 
@@ -154,6 +158,7 @@ function preencherAtributos(config) {
   const mookApp = Object.values(ui.windows).find(w => w.title?.includes("Mook Generator"));
   if (!mookApp) return;
 
+  console.log("🎯 Iniciando preenchimento de atributos com nova lógica...");
 
   // Step 1: Calculate base attributes first (ST, DX, IQ, HT)
   const baseAttributes = {};
@@ -174,6 +179,7 @@ function preencherAtributos(config) {
       // Set the calculated value
       mookApp.element.find(`input[data-key="${attr}"]`).val(val).trigger("change");
       
+      console.log(`📊 ${attr.toUpperCase()}: ${val}`);
     }
   });
 
@@ -188,6 +194,7 @@ function preencherAtributos(config) {
     mookApp.element.find(`input[name="hpMax"]`).val(config.hpMax);
     mookApp.element.find(`input[data-key="hp"]`).val(hpValue).trigger("change");
     
+    console.log(`❤️ HP: ${baseAttributes.st} (ST) + ${hpModifier} (modifier) = ${hpValue}`);
   }
 
   // Will = IQ + random value from Will range
@@ -199,6 +206,7 @@ function preencherAtributos(config) {
     mookApp.element.find(`input[name="willMax"]`).val(config.willMax);
     mookApp.element.find(`input[data-key="will"]`).val(willValue).trigger("change");
     
+    console.log(`🧠 Will: ${baseAttributes.iq} (IQ) + ${willModifier} (modifier) = ${willValue}`);
   }
 
   // Per = IQ + random value from Per range
@@ -210,6 +218,7 @@ function preencherAtributos(config) {
     mookApp.element.find(`input[name="perMax"]`).val(config.perMax);
     mookApp.element.find(`input[data-key="per"]`).val(perValue).trigger("change");
     
+    console.log(`👁️ Per: ${baseAttributes.iq} (IQ) + ${perModifier} (modifier) = ${perValue}`);
   }
 
   // FP = HT + random value from FP range
@@ -221,6 +230,7 @@ function preencherAtributos(config) {
     mookApp.element.find(`input[name="fpMax"]`).val(config.fpMax);
     mookApp.element.find(`input[data-key="fp"]`).val(fpValue).trigger("change");
     
+    console.log(`⚡ FP: ${baseAttributes.ht} (HT) + ${fpModifier} (modifier) = ${fpValue}`);
   }
 
   // UPDATED: Speed = (DX + HT) / 4 + random float from Speed range, rounded to 0.25
@@ -234,6 +244,7 @@ function preencherAtributos(config) {
     mookApp.element.find(`input[name="speedMax"]`).val(config.speedMax);
     mookApp.element.find(`input[data-key="speed"]`).val(speedValue).trigger("change");
     
+    console.log(`🏃 Speed: (${baseAttributes.dx} + ${baseAttributes.ht}) / 4 + ${speedModifier} = ${rawSpeedValue} → ${speedValue} (rounded to 0.25)`);
     
     // Move = integer part of Speed
     const moveValue = Math.floor(speedValue);
@@ -241,6 +252,7 @@ function preencherAtributos(config) {
     mookApp.element.find(`input[name="moveMax"]`).val(config.moveMax || 0);
     mookApp.element.find(`input[data-key="move"]`).val(moveValue).trigger("change");
     
+    console.log(`🚶 Move: floor(${speedValue}) = ${moveValue}`);
     
     // Dodge = integer part of Speed + 3
     const dodgeValue = moveValue + 3;
@@ -248,6 +260,7 @@ function preencherAtributos(config) {
     mookApp.element.find(`input[name="dodgeMax"]`).val(config.dodgeMax || 0);
     mookApp.element.find(`input[data-key="dodge"]`).val(dodgeValue).trigger("change");
     
+    console.log(`🤸 Dodge: ${moveValue} (Move) + 3 = ${dodgeValue}`);
   }
 
   // UPDATED: Shield - no calculation, just random value from range
@@ -258,6 +271,7 @@ function preencherAtributos(config) {
     mookApp.element.find(`input[name="shieldMax"]`).val(config.shieldMax);
     mookApp.element.find(`input[data-key="shield"]`).val(shieldValue).trigger("change");
     
+    console.log(`🛡️ Shield: ${shieldValue}`);
   }
 
   // Step 3: Handle remaining attributes that don't change calculation (dr, coins)
@@ -276,12 +290,14 @@ function preencherAtributos(config) {
 
       // Special handling for coins
       if (attr === "coins") {
+        console.log("🪙 Processando moedas - Valor:", val, "Dados de moeda disponíveis:", currentMookData?.currency);
         const coinDistribution = distributeCoins(val, currentMookData?.currency);
         preencherCampo("equipment", coinDistribution);
       }
       
       mookApp.element.find(`input[data-key="${attr}"]`).val(val).trigger("change");
       
+      console.log(`📊 ${attr.toUpperCase()}: ${val}`);
     }
   });
 
@@ -293,8 +309,10 @@ function preencherAtributos(config) {
     mookApp.element.find(`input[name="smMax"]`).val(config.smMax);
     mookApp.element.find(`input[data-key="sm"]`).val(smValue).trigger("change");
     
+    console.log(`📏 SM: ${smValue}`);
   }
 
+  console.log("✅ Preenchimento de atributos concluído com nova lógica!");
 }
 
 /**
@@ -410,6 +428,8 @@ async function gerarMook(config, mookData) {
     return;
   }
 
+  console.log("🎯 Iniciando geração do Mook...");
+  console.log("🪙 Dados de moeda disponíveis:", mookData?.currency);
 
   // Fill attributes first (including ST) with new calculation logic
   preencherAtributos(config);
@@ -443,6 +463,7 @@ async function gerarMook(config, mookData) {
     preencherCampo('notes', mookData.notes.join('\n'));
   }
 
+  console.log("✅ Geração do Mook concluída!");
 }
 
 /**
@@ -501,7 +522,7 @@ async function inicializarMookGenerator() {
 
 // Module initialization
 Hooks.once("init", () => {
-  console.log("Mookinator | Initializing Mookinator module...");
+  console.log("Mookinator | Módulo inicializado");
   
   game.settings.register("mookinator", "savedClasses", {
     name: "Saved Classes",
@@ -518,6 +539,6 @@ Hooks.once("init", () => {
 });
 
 Hooks.once("ready", () => {
-  console.log("Mookinator | Module ready to use!");
+  console.log("Mookinator | Módulo pronto para uso");
   ui.notifications.info("Mookinator carregado! Use game.mookinator.inicializarMookGenerator() em uma macro.");
 });

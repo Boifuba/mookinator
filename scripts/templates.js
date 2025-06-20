@@ -94,19 +94,30 @@ function generateDialogTemplate(savedClassButtonsHtml, customButtonHtml) {
         </div>
         <div class="selected-class-title"></div>
         <form id="mook-form" class="mook-form">
-          <div class="attributes-section-title">Attributes</div>
+          
           <div class="column">
-<div class="column-header">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;&nbsp;&nbsp</div>
-            ${generateAttributeInputs(['st', 'dx', 'iq', 'ht', 'coins'])}
+                   <div class="column-title-row">
+                      <small class="column-header"></small>
+            <small class="column-header">min</small>
+                  <small class="column-header">max</small>
+</div>            ${generateAttributeInputs(['st', 'dx', 'iq', 'ht', 'coins'])}
           </div>
           <div class="column">
-<div class="column-header">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;&nbsp;&nbsp;</div>
+                              <div class="column-title-row">
+                      <small class="column-header"></small>
+            <small class="column-header">min</small>
+                  <small class="column-header">max</small>
+</div>
             ${generateAttributeInputs(['hp', 'will', 'per', 'fp', 'shield'])}
           </div>
           <div class="column">
-<div class="column-header">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-            ${generateAttributeInputs(['speed', 'move', 'sm', 'dr', 'dodge'], "/")}
+                   <div class="column-title-row">
+                      <small class="column-header"></small>
+            <small class="column-header">min</small>
+                  <small class="column-header">max</small>
+</div>            ${generateAttributeInputs(['speed', 'move', 'sm', 'dr', 'dodge'], "/")}
           </div>
+      
           <div class="vertical-section">
             ${generateSectionGroups(['melee', 'ranged', 'skills', 'spells'])}
             <div class="section-group">

@@ -9,7 +9,7 @@
 /* Hero Section with Dark Background */
 .form-title { 
   text-align: center; 
-  margin: 0 0 10px 0; 
+  margin: 0 0 20px 0; 
   font-size: 20px; 
   font-weight: bold; 
   background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
@@ -38,7 +38,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 10px; 
+  margin-bottom: 15px; 
 }
 
 .saved-class-buttons {
@@ -106,7 +106,7 @@
   background-color: transparent;
 }
 
-
+/* Special styling for the + symbol in custom button */
 .custom-btn .class-name {
   position: static;
   transform: none;
@@ -119,6 +119,7 @@
   max-width: none;
 }
 
+/* FoundryVTT Style Buttons - Sober Colors */
 .action-buttons-group-top {
   display: flex;
   justify-content: center;
@@ -142,38 +143,43 @@
   margin-bottom: 15px; 
   border: 1px solid #ddd;
 }
-
-
-.mook-form {
-    display: flex
-;
-    gap: 9px;
-    flex-wrap: wrap;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: 6px;
-    position: relative;
-    margin-top: 25px;
-    justify-content: center;
+.column-title-row{
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 10px; 
+}
+/* UPDATED: Added more space for attributes title */
+.mook-form { 
+  display: flex; 
+  gap: 8px; 
+  flex-wrap: wrap; 
+  background: rgba(0,0,0,0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.02);
+  position: relative;
+  margin-top: 15px;
+  /* padding: 15px 8px 8px 8px;  */
 }
 
-
+/* UPDATED: Attributes section title with better positioning */
 .attributes-section-title {
   position: absolute;
-      position: absolute;
-    top: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    /* font-weight: 600; */
-    /* color: #4b4b4b; */
-    font-size: 14px;
-    text-transform: uppercase;
-    /* letter-spacing: 0.5px; */
-    /* background: #f8f8f8; */
-    padding: 8px 15px;
-    /* border: 1px solid #ddd; */
-    /* border-radius: 4px; */
-    
+  top: -35px; /* Moved further up */
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 600;
+  color: #4b4b4b;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #f8f8f8;
+  padding: 8px 15px; /* Increased padding */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Added subtle shadow */
 }
+
 .column { 
   display: flex; 
   flex-direction: column; 
@@ -183,8 +189,9 @@
 }
 
 .column-label { 
-
+  font-weight: 600; 
   margin-bottom: 6px; 
+  color: #4b4b4b; 
   font-size: 12px; 
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -192,15 +199,18 @@
 
 /* Column headers for - and + signs */
 .column-header {
-  font-size: 14px;
-  text-align: right;
-  margin-bottom: 6px;
+  font-size: 10px;
+  color: #4b4b4b;
+  text-align: center;
+  margin-bottom: 4px;
   height: 20px;
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: right; 
+  justify-content: center;
   background: rgba(0,0,0,0.05);
-
+  /* border-radius: 3px;
+  border: 1px solid #ddd; */
 }
 
 .input-row { 
@@ -246,7 +256,7 @@
 
 .vertical-section { 
   flex-basis: 100%; 
-  padding-top: 10px; 
+  padding-top: 15px; 
   border-top: 2px solid #ccc; 
   display: flex; 
   flex-wrap: wrap; 
