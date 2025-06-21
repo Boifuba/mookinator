@@ -1,0 +1,148 @@
+{
+  "name_default": "Guardas",
+  "image_default": "modules/mookinator/images/mookinator.png",
+  "title": "Guardas",
+  "imageUrl": "modules/mookinator/images/mookinator.png",
+  "traitsList": [
+    { "nome": "Combat Reflexes", "valor": "" },
+    { "nome": "High Pain Threshold", "valor": "" },
+    { "nome": "Fit", "valor": "" },
+    { "nome": "Duty", "valor": "12" },
+    { "nome": "Code of Honor", "valor": "" },
+    { "nome": "Sense of Duty", "valor": "" }
+  ],
+  "skillsList": [
+    { "nome": "Brawling" },
+    { "nome": "Shield" },
+    { "nome": "Spear" },
+    { "nome": "Sword" },
+    { "nome": "Crossbow" },
+    { "nome": "Bow" },
+    { "nome": "Observation" },
+    { "nome": "Intimidation" },
+    { "nome": "Leadership" },
+    { "nome": "Tactics" }
+  ],
+  "spellsList": [],
+  "meleeSkills": [
+    {
+      "nome": "Medium Shield",
+      "shield": true,
+      "db": 2,
+      "attacks": [
+        {
+          "dano": "1d cr",
+          "usage": "Shield Bash",
+          "reach": "1",
+          "parry": "0F",
+          "st": "12",
+          "block": "",
+          "inferredBaseDamageType": "thr"
+        }
+      ]
+    },
+    {
+      "nome": "Spear",
+      "attacks": [
+        {
+          "dano": "1d+2 imp",
+          "usage": "Thrust",
+          "reach": "1,2",
+          "parry": "0U",
+          "st": "10",
+          "block": "",
+          "inferredBaseDamageType": "thr"
+        },
+        {
+          "dano": "1d+3 imp",
+          "usage": "Thrust",
+          "reach": "1,2*",
+          "parry": "0U",
+          "st": "10",
+          "block": "",
+          "inferredBaseDamageType": "thr"
+        }
+      ]
+    },
+    {
+      "nome": "Broadsword",
+      "attacks": [
+        {
+          "dano": "1d+1 cut",
+          "usage": "Swing",
+          "reach": "1",
+          "parry": "0U",
+          "st": "10",
+          "block": "",
+          "inferredBaseDamageType": "sw"
+        },
+        {
+          "dano": "1d+1 imp",
+          "usage": "Thrust",
+          "reach": "1",
+          "parry": "0U",
+          "st": "10",
+          "block": "",
+          "inferredBaseDamageType": "thr"
+        }
+      ]
+    }
+  ],
+  "rangedSkills": [
+    {
+      "nome": "Light Crossbow",
+      "dano": "1d+4 imp",
+      "usage": "Shoot",
+      "acc": "4",
+      "rof": "1",
+      "recoil": "1",
+      "range": "240/300",
+      "shots": "1(4)",
+      "bulk": "-4",
+      "st": "7",
+      "inferredBaseDamageType": "thr"
+    },
+    {
+      "nome": "Regular Bow",
+      "dano": "1d+1 imp",
+      "usage": "Shoot",
+      "acc": "2",
+      "rof": "1",
+      "recoil": "1",
+      "range": "150/200",
+      "shots": "1(2)",
+      "bulk": "-7",
+      "st": "10",
+      "inferredBaseDamageType": "thr"
+    }
+  ],
+  "atributos": {
+    "st": { "min": 10, "max": 12 },
+    "dx": { "min": 10, "max": 12 },
+    "iq": { "min": 9, "max": 11 },
+    "ht": { "min": 10, "max": 12 },
+    "hp": { "min": -1, "max": 2 },
+    "will": { "min": -1, "max": 1 },
+    "per": { "min": 0, "max": 2 },
+    "fp": { "min": -1, "max": 1 },
+    "shield": { "min": -1, "max": 1 },
+    "parry": { "min": -1, "max": 1 },
+    "speed": { "min": -0.25, "max": 0.5 },
+    "move": { "min": 4, "max": 6 },
+    "sm": { "min": 0, "max": 0 },
+    "dr": { "min": 2, "max": 4 },
+    "dodge": { "min": -1, "max": 1 },
+    "coins": { "min": 20, "max": 80 }
+  },
+  "skills": { "qty": 3, "min": 10, "max": 13 },
+  "ranged": { "qty": 1, "min": 10, "max": 12 },
+  "melee": { "qty": 2, "min": 11, "max": 14 },
+  "spells": { "qty": 0, "min": 9, "max": 13 },
+  "traits": { "qty": 3 },
+  "notes": ["Guard duty patrol", "Follows orders strictly", "Loyal to their post"],
+  "currency": [
+    { "name": "gold", "cost": 80, "weight": 0.04, "unit": "lbs" },
+    { "name": "silver", "cost": 4, "weight": 0.04, "unit": "lbs" },
+    { "name": "copper", "cost": 1, "weight": 0.008, "unit": "lbs" }
+  ]
+}

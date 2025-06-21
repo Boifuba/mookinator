@@ -8,12 +8,12 @@
 async function gerarMook(config, mookData) {
   const mookApp = Object.values(ui.windows).find(w => w.title?.includes("Mook Generator"));
   if (!mookApp) {
-    ui.notifications.warn("A janela do Mook Generator não está aberta.");
+    ui.notifications.warn("The Mook Generator window is not open.");
     return;
   }
 
-  console.log("🎯 Iniciando geração do Mook...");
-  console.log("🪙 Dados de moeda disponíveis:", mookData?.currency);
+  console.log("🎯 Starting Mookinator...");
+  
 
   // Fill attributes first (including ST) with new calculation logic
   window.MookinatorFormOperations.preencherAtributos(config);
@@ -26,9 +26,7 @@ async function gerarMook(config, mookData) {
   const stValue = calculatedAttributes.st || 10;
   const shieldAttributeValue = calculatedAttributes.shield || 0;
   
-  console.log(`💪 ST calculado para dano de armas: ${stValue}`);
-  console.log(`🛡️ Valor do atributo Shield: ${shieldAttributeValue}`);
-
+  
   // Fill all skill types with ST-based damage calculation and shield attribute
   window.MookinatorFormOperations.preencherSkills(mookData.meleeSkills, 'melee', config.melee, stValue, shieldAttributeValue);
   window.MookinatorFormOperations.preencherSkills(mookData.rangedSkills, 'ranged', config.ranged, stValue);
@@ -49,7 +47,7 @@ async function gerarMook(config, mookData) {
     updatedAttributes.dodge = finalDodge;
     window.MookinatorState.setLastCalculatedAttributes(updatedAttributes);
     
-    console.log(`🤸 Dodge final: ${currentDodge} (base) + ${shieldDbBonus} (DB bonus) = ${finalDodge}`);
+  
   }
 
   // Fill traits
@@ -72,7 +70,7 @@ async function gerarMook(config, mookData) {
     window.MookinatorFormOperations.preencherCampo('notes', mookData.notes.join('\n'));
   }
 
-  console.log("✅ Geração do Mook concluída!");
+  
 }
 
 /**
@@ -127,7 +125,7 @@ async function inicializarMookGenerator() {
 
 // Module initialization
 Hooks.once("init", () => {
-  console.log("Mookinator | Módulo inicializado");
+  console.log("Mookinator | module initialization started");
   
   game.settings.register("mookinator", "savedClasses", {
     name: "Saved Classes",
@@ -140,7 +138,7 @@ Hooks.once("init", () => {
 });
 
 Hooks.once("ready", () => {
-  console.log("Mookinator | Módulo pronto para uso");
+  console.log("Mookinator | Module is ready to use!");
   
   // Ensure game.mookinator is properly initialized
   if (!game.mookinator) {

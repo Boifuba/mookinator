@@ -25,7 +25,8 @@
     "scripts/data-loader.js",
     "scripts/mook-form-operations.js",
     "scripts/mook-state.js",
-    "scripts/mook-utils.js"
+    "scripts/mook-utils.js",
+    "data/default-class.json"
   ],
   "styles": [
     "styles/mookinator.css"

@@ -7,7 +7,7 @@
  */
 function generateSavedClassButtonsHtml(savedClasses) {
   if (!savedClasses || savedClasses.length === 0) {
-    return '<p class="no-saved-classes">Nenhuma classe salva. Carregue um JSON e salve-o para começar.</p>';
+    return '<p class="no-saved-classes">No classes saved. Load a JSON file and save it to get started.</p>';
   }
 
   return savedClasses.map(cls => `

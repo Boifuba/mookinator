@@ -8,7 +8,7 @@
 function preencherCampo(textareaKey, content) {
   const mookApp = Object.values(ui.windows).find(w => w.title?.includes("Mook Generator"));
   if (!mookApp) {
-    ui.notifications.warn("A janela do Mook Generator não está aberta.");
+    ui.notifications.warn("A janela do Mook The Mook Generator window is not open.");
     return;
   }
 

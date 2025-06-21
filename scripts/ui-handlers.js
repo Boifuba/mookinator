@@ -25,11 +25,11 @@ function setupClassSelectionHandler(html, loadCustomJSONHandler) {
       };
       
       // Update selected class title
-      html.find(".selected-class-title").text(`Mook selected: ${window.MookinatorState.currentSelectedClassData.title}`);
+      html.find(".selected-class-title").text(`Class selected: ${window.MookinatorState.currentSelectedClassData.title}`);
     } else if ($(this).hasClass("custom-btn")) {
       // Handle custom JSON/GCS loading
       window.MookinatorState.currentSelectedClassData = null;
-      html.find(".selected-class-title").text("Carregando arquivo...");
+      html.find(".selected-class-title").text("Loading file...");
       
       // Use the provided handler function
       if (loadCustomJSONHandler && typeof loadCustomJSONHandler === 'function') {
@@ -48,7 +48,7 @@ function setupGlobalLoadDeleteButtons(html, deleteClassHandler) {
   // Handle load selected button
   html.find("#load-selected-btn").on("click", () => {
     if (!window.MookinatorState.currentSelectedClassData) {
-      ui.notifications.warn("Nenhuma Mook selected. Selecione uma classe primeiro.");
+      ui.notifications.warn("No Mook selected. Please select a class first.");
       return;
     }
 
@@ -60,14 +60,14 @@ function setupGlobalLoadDeleteButtons(html, deleteClassHandler) {
       // Use the function to populate form from saved data
       window.MookinatorDataLoader.populateFormFromSavedData(html, classData, window.MookinatorState.setCurrentMookDataAndPath);
     } else {
-      ui.notifications.error("Dados da classe não encontrados.");
+      ui.notifications.error("");
     }
   });
 
   // Handle delete selected button
   html.find("#delete-selected-btn").on("click", () => {
     if (!window.MookinatorState.currentSelectedClassData) {
-      ui.notifications.warn("Nenhuma Mook selected. Selecione uma classe primeiro.");
+      ui.notifications.warn("Class is not selected. Please select a class first.");
       return;
     }
 
@@ -76,7 +76,7 @@ function setupGlobalLoadDeleteButtons(html, deleteClassHandler) {
     // Show confirmation dialog
     Dialog.confirm({
       title: "Confirmar Remoção",
-      content: `<p>Tem certeza que deseja remover a classe "<strong>${classData.title}</strong>"?</p>`,
+      content: `<p>Are you sure you want to remove the class "<strong>${classData.title}</strong>"?</p>`,
       yes: () => {
         if (deleteClassHandler(classData.id)) {
           // Remove the button from UI
@@ -88,7 +88,7 @@ function setupGlobalLoadDeleteButtons(html, deleteClassHandler) {
           
           // Check if no more saved classes exist
           if (html.find('.saved-class-btn').length === 0) {
-            html.find('.saved-class-buttons').html('<p class="no-saved-classes">Nenhuma classe salva. Carregue um JSON e salve-o para começar.</p>' + window.MookinatorTemplates.generateCustomButtonHtml());
+            html.find('.saved-class-buttons').html('<p class="no-saved-classes">No classes saved. Load a JSON file and save it to get started.</p>' + window.MookinatorTemplates.generateCustomButtonHtml());
           }
         }
       },
@@ -109,13 +109,13 @@ function setupSaveButtonHandler(html, saveClassHandler, getCurrentMookData) {
     const currentData = getCurrentMookData();
     
     if (!currentData.mookData) {
-      ui.notifications.warn("Nenhuma classe carregada para salvar.");
+      ui.notifications.warn("No Class selected. Pick one first.");
       return;
     }
 
     // Show dialog to get class name and image
     const saveDialog = new Dialog({
-      title: "Salvar Classe",
+      title: "Save Class",
       content: `
         <form>
           <div class="form-group">
@@ -139,7 +139,7 @@ function setupSaveButtonHandler(html, saveClassHandler, getCurrentMookData) {
             const imageUrl = dialogHtml.find('input[name="imageUrl"]').val().trim();
             
             if (!className) {
-              ui.notifications.warn("Nome da classe é obrigatório.");
+              ui.notifications.warn("Class name cannot be empty.");
               return false; // Prevent dialog from closing
             }
 
