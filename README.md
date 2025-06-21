@@ -1,7 +1,9 @@
 
-# Mookinator
 
 ![Mookinator Logo](https://github.com/Boifuba/mookinator/blob/main/images/mookinator.png) 
+
+# Mookinator
+
 
 A custom module for Foundry VTT, developed to streamline the creation of "mooks" (generic characters or enemies) for the GURPS system. With Mookinator, you can quickly generate stats, skills, equipment, and even coins for your characters, based on customizable settings or by importing data from GCS/JSON files.
 
