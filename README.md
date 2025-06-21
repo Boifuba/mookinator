@@ -1,7 +1,7 @@
 
 # Mookinator
 
-![Mookinator Logo](https://raw.githubusercontent.com/Boifuba/mookinator/main/assets/mookinator_logo.png) <!-- Replace with your actual logo path, if any -->
+![Mookinator Logo](https://github.com/Boifuba/mookinator/blob/main/images/mookinator.png) 
 
 A custom module for Foundry VTT, developed to streamline the creation of "mooks" (generic characters or enemies) for the GURPS system. With Mookinator, you can quickly generate stats, skills, equipment, and even coins for your characters, based on customizable settings or by importing data from GCS/JSON files.
 
@@ -54,10 +54,10 @@ There are two main ways to install Mookinator in Foundry VTT:
 
 To open the Mookinator interface, you need to run a JavaScript macro.
 
-1. In Foundry VTT, open the **Macros** tab (usually on the right sidebar, scroll icon).  
-2. Click **Create Macro**, or right-click an empty space on the macro bar and choose **Create Macro**.  
+1. In Foundry VTT, open the **Compendiuns** tab (usually on the right sidebar)  
+2. Find Mokinator and drag it to your macro bar 
 3. Name the macro (e.g., "Open Mookinator").  
-4. Set the macro **Type** to `Script`.  
+4. Or just create a new macro and set the macro **Type** to `Script`.  
 5. In the **Command** field, paste the following code:
    ```javascript
    game.mookinator.inicializarMookGenerator();
