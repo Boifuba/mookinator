@@ -68,6 +68,24 @@ function generateSectionGroups(sections) {
 }
 
 /**
+ * Generate coins section group HTML (min/max only)
+ * @returns {string} HTML string for coins section group
+ */
+function generateCoinsSection() {
+  return `
+    <div class="section-group">
+      <div class="section-label">Coins:</div>
+      <div class="section-inputs">
+        <span class="section-input-label">Min</span>
+        <input type="number" name="coinsMin" class="input-field-coins"/>
+        <span class="section-input-label">Max</span>
+        <input type="number" name="coinsMax" class="input-field-coins"/>
+      </div>
+    </div>
+  `;
+}
+
+/**
  * Generate the complete dialog HTML template
  * @param {string} savedClassButtonsHtml - HTML for saved class buttons
  * @param {string} customButtonHtml - HTML for custom button
@@ -100,7 +118,7 @@ function generateDialogTemplate(savedClassButtonsHtml, customButtonHtml) {
                       <small class="column-header"></small>
             <small class="column-header">min</small>
                   <small class="column-header">max</small>
-</div>            ${generateAttributeInputs(['st', 'dx', 'iq', 'ht', 'coins'])}
+</div>            ${generateAttributeInputs(['st', 'dx', 'iq', 'ht', 'parry'])}
           </div>
           <div class="column">
                               <div class="column-title-row">
@@ -127,6 +145,7 @@ function generateDialogTemplate(savedClassButtonsHtml, customButtonHtml) {
                 <input type="number" name="traitsQty" class="input-field"/>
               </div>
             </div>
+            ${generateCoinsSection()}
           </div>
           <div class="action-buttons-group-bottom">
             <button type="button" id="gerar-btn" class="generate-btn">Generate Random Mook</button>
@@ -143,5 +162,6 @@ window.MookinatorTemplates = {
   generateCustomButtonHtml,
   generateAttributeInputs,
   generateSectionGroups,
+  generateCoinsSection,
   generateDialogTemplate
 };

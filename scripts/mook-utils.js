@@ -88,6 +88,47 @@ function roundToQuarter(value) {
 }
 
 /**
+ * Extract damage type from full damage string - NEW FUNCTION
+ * @param {string} fullDamageString - Full damage string like "1d+2 cut", "2d imp", "1d-1 cr"
+ * @returns {string|null} Damage type (cut, imp, cr, pi, burn, tox, fat, cor, etc.) or null if not found
+ */
+function extractDamageTypeFromFullDamageString(fullDamageString) {
+  if (!fullDamageString || typeof fullDamageString !== 'string') {
+    return null;
+  }
+
+  const str = fullDamageString.trim().toLowerCase();
+  
+  // Common GURPS damage types - ordered by specificity to avoid partial matches
+  const damageTypes = [
+    'pi++', 'pi+', 'pi-', 'pi',  // Piercing variants (most specific first)
+    'cut', 'imp', 'cr',          // Common physical types
+    'burn', 'cor', 'fat', 'tox', // Special damage types
+    'spec'                       // Special damage
+  ];
+  
+  // Look for damage type at the end of the string (most common format)
+  for (const damageType of damageTypes) {
+    // Match damage type as a separate word at the end
+    const regex = new RegExp(`\\b${damageType.replace(/[+\-]/g, '\\$&')}$`, 'i');
+    if (regex.test(str)) {
+      return damageType;
+    }
+  }
+  
+  // Look for damage type anywhere in the string as fallback
+  for (const damageType of damageTypes) {
+    const regex = new RegExp(`\\b${damageType.replace(/[+\-]/g, '\\$&')}\\b`, 'i');
+    if (regex.test(str)) {
+      return damageType;
+    }
+  }
+  
+  console.warn(`⚠️ Tipo de dano não encontrado na string: "${fullDamageString}"`);
+  return null;
+}
+
+/**
  * Distribute coins among different currency types - SIMPLIFIED
  * @param {number} totalValue - Total value to distribute
  * @param {Array} currencyData - Array of currency objects
@@ -243,6 +284,64 @@ function parseWeaponDamageTypeString(typeStr) {
 }
 
 /**
+ * Parse parry string to extract numeric and letter components
+ * @param {string} parryStr - Parry string like "2U", "0F", "OF", "3F"
+ * @returns {object} Object with numeric and letter properties
+ */
+function parseParryString(parryStr) {
+  if (!parryStr || parryStr.trim() === '') {
+    return { numeric: 0, letter: '' };
+  }
+
+  const str = parryStr.trim();
+  
+  // Match patterns like "2U", "0F", "3F"
+  const match = str.match(/^(\d+)([A-Za-z])$/);
+  if (match) {
+    return {
+      numeric: parseInt(match[1]),
+      letter: match[2]
+    };
+  }
+  
+  // Handle cases like "OF" (letter only, numeric is 0)
+  const letterOnlyMatch = str.match(/^([A-Za-z])$/);
+  if (letterOnlyMatch) {
+    return {
+      numeric: 0,
+      letter: letterOnlyMatch[1]
+    };
+  }
+  
+  // Handle pure numbers (no letter)
+  const numOnlyMatch = str.match(/^(\d+)$/);
+  if (numOnlyMatch) {
+    return {
+      numeric: parseInt(numOnlyMatch[1]),
+      letter: ''
+    };
+  }
+  
+  return { numeric: 0, letter: '' };
+}
+
+/**
+ * Calculate parry value using the formula: floor(nivel / 2) + 3 + originalNumeric + originalLetter + dbBonus
+ * @param {number} nivel - Skill level
+ * @param {string} originalParry - Original parry string from weapon data
+ * @param {number} dbBonus - Shield DB bonus to add to parry
+ * @returns {string} Calculated parry value with letter
+ */
+function calculateParryValue(nivel, originalParry, dbBonus = 0) {
+  const parsed = parseParryString(originalParry);
+  const baseParry = Math.floor(nivel / 2) + 3;
+  const finalNumeric = baseParry + parsed.numeric + dbBonus;
+  
+  // Return the calculated value with the original letter
+  return parsed.letter ? `${finalNumeric}${parsed.letter}` : `${finalNumeric}`;
+}
+
+/**
  * Calculate final damage values for a weapon based on ST
  * @param {number} st - Strength value
  * @param {object} item - Weapon item with type array
@@ -320,5 +419,8 @@ window.MookinatorUtils = {
   parseDamageString,
   formatDamageString,
   combineDamageStrings,
-  parseWeaponDamageTypeString
+  parseWeaponDamageTypeString,
+  parseParryString,
+  calculateParryValue,
+  extractDamageTypeFromFullDamageString  // NEW EXPORT
 };

@@ -10,6 +10,9 @@ let currentSelectedClassData = null;
 // NEW: Global variable to store last calculated attributes
 let lastCalculatedAttributes = {};
 
+// NEW: Global variable to store current shield DB bonus
+let currentShieldDbBonus = 0;
+
 /**
  * Set current mook data and related information
  * @param {Object} data - Mook data object
@@ -56,6 +59,7 @@ function clearCurrentMookData() {
   currentMookImageUrl = null;
   currentSelectedClassData = null;
   lastCalculatedAttributes = {}; // Clear calculated attributes too
+  currentShieldDbBonus = 0; // Clear shield DB bonus too
 }
 
 /**
@@ -84,6 +88,23 @@ function getCalculatedAttributeValue(attributeName) {
   return lastCalculatedAttributes[attributeName] || 0;
 }
 
+/**
+ * Set shield DB bonus value
+ * @param {number} value - Shield DB bonus value
+ */
+function setShieldDbBonus(value) {
+  currentShieldDbBonus = value || 0;
+  console.log(`🛡️ Shield DB bonus definido: ${currentShieldDbBonus}`);
+}
+
+/**
+ * Get shield DB bonus value
+ * @returns {number} Current shield DB bonus value
+ */
+function getShieldDbBonus() {
+  return currentShieldDbBonus;
+}
+
 // Export functions and variables for use in other modules
 window.MookinatorState = {
   setCurrentMookDataAndPath,
@@ -92,6 +113,8 @@ window.MookinatorState = {
   setLastCalculatedAttributes,
   getLastCalculatedAttributes,
   getCalculatedAttributeValue,
+  setShieldDbBonus,
+  getShieldDbBonus,
   get currentSelectedClassData() { return currentSelectedClassData; },
   set currentSelectedClassData(value) { currentSelectedClassData = value; }
 };

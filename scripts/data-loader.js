@@ -58,27 +58,88 @@ function isShield(tags) {
 }
 
 /**
- * Extract shield DB value from equipment
+ * Extract shield DB value from equipment - FIXED TO SEARCH IN CORRECT LOCATION
  * @param {Object} equip - Equipment object
  * @returns {number} Shield DB value or 0
  */
 function extractShieldDB(equip) {
-  // Try different possible locations for shield DB value
-  if (equip.dr && typeof equip.dr === 'number') {
-    return equip.dr;
+  console.log(`🛡️ Extraindo DB do escudo: ${equip.description}`);
+  
+  // PRIORITY 1: Look for DB in equip.features array (where it actually is in the JSON)
+  if (equip.features && Array.isArray(equip.features)) {
+    console.log(`🛡️ Analisando ${equip.features.length} features principais do escudo...`);
+    
+    let maxPositiveAmount = 0;
+    
+    for (const feature of equip.features) {
+      console.log(`🛡️ Feature: type=${feature.type}, amount=${feature.amount}, situation="${feature.situation}"`);
+      
+      if (feature.type === 'conditional_modifier' && 
+          typeof feature.amount === 'number' && 
+          feature.amount > 0) {
+        
+        // Check if situation mentions defensive capabilities
+        const situation = (feature.situation || '').toLowerCase();
+        
+        if (situation.includes('dodge') || 
+            situation.includes('parry') || 
+            situation.includes('block') || 
+            situation.includes('db') ||
+            situation.includes('defense')) {
+          
+          if (feature.amount > maxPositiveAmount) {
+            maxPositiveAmount = feature.amount;
+            console.log(`🛡️ Novo maior DB encontrado nas features principais: ${maxPositiveAmount}`);
+          }
+        }
+      }
+    }
+    
+    if (maxPositiveAmount > 0) {
+      console.log(`🛡️ DB final extraído das features principais: ${maxPositiveAmount}`);
+      return maxPositiveAmount;
+    }
   }
   
-  if (equip.db && typeof equip.db === 'number') {
-    return equip.db;
+  // PRIORITY 2: Fallback - Look for DB in weapons.features array
+  if (equip.weapons && Array.isArray(equip.weapons)) {
+    console.log(`🛡️ Fallback: Analisando features das armas do escudo...`);
+    
+    for (const weapon of equip.weapons) {
+      if (weapon.features && Array.isArray(weapon.features)) {
+        let maxPositiveAmount = 0;
+        
+        for (const feature of weapon.features) {
+          if (feature.type === 'conditional_modifier' && 
+              typeof feature.amount === 'number' && 
+              feature.amount > 0) {
+            
+            const situation = (feature.situation || '').toLowerCase();
+            
+            if (situation.includes('dodge') || 
+                situation.includes('parry') || 
+                situation.includes('block') || 
+                situation.includes('db') ||
+                situation.includes('defense')) {
+              
+              if (feature.amount > maxPositiveAmount) {
+                maxPositiveAmount = feature.amount;
+                console.log(`🛡️ DB encontrado nas features da arma: ${maxPositiveAmount}`);
+              }
+            }
+          }
+        }
+        
+        if (maxPositiveAmount > 0) {
+          console.log(`🛡️ DB final extraído das features da arma: ${maxPositiveAmount}`);
+          return maxPositiveAmount;
+        }
+      }
+    }
   }
   
-  // Check if there's a defensive bonus in the equipment
-  if (equip.defensive_bonus && typeof equip.defensive_bonus === 'number') {
-    return equip.defensive_bonus;
-  }
-  
-  // Default shield DB if none found
-  return 2;
+  console.warn(`🛡️ ERRO: Nenhum DB válido encontrado nas features do escudo "${equip.description}"`);
+  return null; // Return null instead of 0 to indicate no valid DB found
 }
 
 /**
@@ -211,8 +272,15 @@ function processGCSData(gcsData) {
             if (isShield(equip.tags)) {
               console.log(`🛡️ Processando escudo: ${equip.description}`);
               newMeleeSkill.shield = true;
-              newMeleeSkill.db = extractShieldDB(equip);
-              console.log(`🛡️ Escudo ${equip.description} com DB: ${newMeleeSkill.db}`);
+              
+              const extractedDb = extractShieldDB(equip);
+              newMeleeSkill.db = extractedDb;
+              
+              if (extractedDb !== null && extractedDb > 0) {
+                console.log(`🛡️ Escudo ${equip.description} processado com DB: ${extractedDb}`);
+              } else {
+                console.log(`🛡️ ERRO ao extrair DB do escudo ${equip.description}: DB inválido (${extractedDb})`);
+              }
             }
 
             meleeSkills.push(newMeleeSkill);
@@ -225,20 +293,21 @@ function processGCSData(gcsData) {
   // Create default configurations
   const createDefaultRange = (min, max) => ({ min, max });
   const defaultAtributos = {
-    st: createDefaultRange(10, 15),
-    dx: createDefaultRange(10, 15),
-    iq: createDefaultRange(10, 15),
-    ht: createDefaultRange(10, 15),
-    hp: createDefaultRange(10, 15),
-    will: createDefaultRange(10, 15),
-    per: createDefaultRange(10, 15),
-    fp: createDefaultRange(10, 15),
-    shield: createDefaultRange(8, 12), // UPDATED: Changed from parry to shield
-    speed: createDefaultRange(5, 8),
-    move: createDefaultRange(5, 8),
+    st: createDefaultRange(10, 12),
+    dx: createDefaultRange(10, 12),
+    iq: createDefaultRange(10, 12),
+    ht: createDefaultRange(10, 12),
+    hp: createDefaultRange(-4, 4),
+    will: createDefaultRange(-2, 2),
+    per: createDefaultRange(-2, 4),
+    fp: createDefaultRange(-2, 4),
+    shield: createDefaultRange(-1, 1), 
+    parry: createDefaultRange(-1, 1),
+    speed: createDefaultRange(-0.25, 0.75),
+    move: createDefaultRange(4, 6),
     sm: createDefaultRange(0, 2),
-    dr: createDefaultRange(0, 5),
-    dodge: createDefaultRange(8, 12),
+    dr: createDefaultRange(0, 3),
+    dodge: createDefaultRange(-1, 1),
     coins: createDefaultRange(50, 200)
   };
 
@@ -251,11 +320,11 @@ function processGCSData(gcsData) {
     meleeSkills,
     rangedSkills,
     atributos: defaultAtributos,
-    skills: { qty: 3, min: 9, max: 14 },
-    ranged: { qty: 2, min: 9, max: 14 },
-    melee: { qty: 3, min: 9, max: 14 },
-    spells: { qty: 2, min: 9, max: 14 },
-    traits: { qty: 5 },
+    skills: { qty: 2, min: 9, max: 13 },
+    ranged: { qty: 2, min: 9, max: 13 },
+    melee: { qty: 2, min: 9, max: 13 },
+    spells: { qty: 2, min: 9, max: 13 },
+    traits: { qty: 4 },
     notes: gcsData.notes ? [gcsData.notes] : [],
     currency: gcsData.currency || DEFAULT_CURRENCY_DATA
   };
@@ -324,8 +393,8 @@ function extractCurrentFormConfig(html) {
     return isNaN(val) ? fallback : val;
   };
 
-  // Extract attributes configuration - UPDATED: Changed parry to shield
-  const attributes = ['st', 'dx', 'iq', 'ht', 'hp', 'will', 'per', 'fp', 'shield', 'speed', 'move', 'sm', 'dr', 'dodge', 'coins'];
+  // Extract attributes configuration - UPDATED: Added parry
+  const attributes = ['st', 'dx', 'iq', 'ht', 'hp', 'will', 'per', 'fp', 'shield', 'parry', 'speed', 'move', 'sm', 'dr', 'dodge', 'coins'];
   const atributos = {};
   attributes.forEach(attr => {
     atributos[attr] = {

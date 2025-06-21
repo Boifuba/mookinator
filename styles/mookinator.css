@@ -21,11 +21,13 @@
   border: 1px solid #444;
 }
 
-.selected-class-title { 
-  text-align: center; 
-  font-size: 14px; 
-  font-weight: 600; 
-  margin-top: 10px;
+.selected-class-title {
+    text-align: center;
+    font-size: 12px;
+    /* font-weight: 600; */
+    margin: 4px 0 4px 0;
+    font-style: italic;
+    color: green;
 }
 
 .mook-form-container { 
@@ -45,7 +47,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  gap: 6px; 
+  
 }
 
 .no-saved-classes {
@@ -152,7 +154,7 @@
 /* UPDATED: Added more space for attributes title */
 .mook-form { 
   display: flex; 
-  gap: 8px; 
+  gap: 12px; 
   flex-wrap: wrap; 
   background: rgba(0,0,0,0.02);
   border-radius: 6px;
@@ -233,6 +235,16 @@
 /* FoundryVTT Native Style Inputs */
 .input-field { 
   width: 32px; 
+  padding: 3px 6px; 
+  border: 1px solid #a0a0a0; 
+  border-radius: 3px; 
+  font-size: 11px; 
+  text-align: center; 
+  color: #191813;
+  font-family: inherit;
+}
+.input-field-coins { 
+  width: 60px; 
   padding: 3px 6px; 
   border: 1px solid #a0a0a0; 
   border-radius: 3px; 

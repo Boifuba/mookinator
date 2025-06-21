@@ -1,7 +1,7 @@
 // Mookinator Module - Main Script
 
 /**
- * Main function to generate the Mook - UPDATED WITH ST-BASED DAMAGE CALCULATION AND SHIELD ATTRIBUTE
+ * Main function to generate the Mook - UPDATED WITH ST-BASED DAMAGE CALCULATION, SHIELD ATTRIBUTE, AND DB BONUS
  * @param {Object} config - Configuration object
  * @param {Object} mookData - Mook data object
  */
@@ -34,6 +34,23 @@ async function gerarMook(config, mookData) {
   window.MookinatorFormOperations.preencherSkills(mookData.rangedSkills, 'ranged', config.ranged, stValue);
   window.MookinatorFormOperations.preencherSkills(mookData.skillsList, 'skills', config.skills);
   window.MookinatorFormOperations.preencherSkills(mookData.spellsList, 'spells', config.spells);
+
+  // CRITICAL: Apply DB bonus to Dodge after melee skills are processed
+  const shieldDbBonus = window.MookinatorState.getShieldDbBonus();
+  if (shieldDbBonus > 0) {
+    const currentDodge = window.MookinatorState.getCalculatedAttributeValue('dodge');
+    const finalDodge = currentDodge + shieldDbBonus;
+    
+    // Update the dodge field in the form
+    mookApp.element.find('input[data-key="dodge"]').val(finalDodge).trigger("change");
+    
+    // Update the dodge value in global state
+    const updatedAttributes = window.MookinatorState.getLastCalculatedAttributes();
+    updatedAttributes.dodge = finalDodge;
+    window.MookinatorState.setLastCalculatedAttributes(updatedAttributes);
+    
+    console.log(`🤸 Dodge final: ${currentDodge} (base) + ${shieldDbBonus} (DB bonus) = ${finalDodge}`);
+  }
 
   // Fill traits
   if (mookData.traitsList && Array.isArray(mookData.traitsList)) {
@@ -135,7 +152,7 @@ Hooks.once("ready", () => {
   // Add to global scope for debugging
   window.mookinator = game.mookinator;
   
-  ui.notifications.info("Mookinator carregado! Use game.mookinator.inicializarMookGenerator() em uma macro.");
+  // ui.notifications.info("Mookinator carregado! Use game.mookinator.inicializarMookGenerator() em uma macro.");
   
   // Debug log to verify initialization
   console.log("Mookinator | game.mookinator:", game.mookinator);
