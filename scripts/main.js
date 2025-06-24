@@ -14,38 +14,39 @@ async function gerarMook(config, mookData) {
 
   console.log("🎯 Starting Mookinator...");
   
+  const mookinator = game.modules.get("mookinator").api;
 
   // Fill attributes first (including ST) with new calculation logic
-  window.MookinatorFormOperations.preencherAtributos(config);
+  mookinator.formOperations.preencherAtributos(config);
   
   // Small delay to ensure fields are updated
   await new Promise(resolve => setTimeout(resolve, 100));
 
-  // CRITICAL FIX: Get the calculated ST and Shield values from global state instead of form fields
-  const calculatedAttributes = window.MookinatorState.getLastCalculatedAttributes();
+  // CRITICAL FIX: Get the calculated ST and Shield values from module state instead of form fields
+  const calculatedAttributes = mookinator.state.getLastCalculatedAttributes();
   const stValue = calculatedAttributes.st || 10;
   const shieldAttributeValue = calculatedAttributes.shield || 0;
   
   
   // Fill all skill types with ST-based damage calculation and shield attribute
-  window.MookinatorFormOperations.preencherSkills(mookData.meleeSkills, 'melee', config.melee, stValue, shieldAttributeValue);
-  window.MookinatorFormOperations.preencherSkills(mookData.rangedSkills, 'ranged', config.ranged, stValue);
-  window.MookinatorFormOperations.preencherSkills(mookData.skillsList, 'skills', config.skills);
-  window.MookinatorFormOperations.preencherSkills(mookData.spellsList, 'spells', config.spells);
+  mookinator.formOperations.preencherSkills(mookData.meleeSkills, 'melee', config.melee, stValue, shieldAttributeValue);
+  mookinator.formOperations.preencherSkills(mookData.rangedSkills, 'ranged', config.ranged, stValue);
+  mookinator.formOperations.preencherSkills(mookData.skillsList, 'skills', config.skills);
+  mookinator.formOperations.preencherSkills(mookData.spellsList, 'spells', config.spells);
 
   // CRITICAL: Apply DB bonus to Dodge after melee skills are processed
-  const shieldDbBonus = window.MookinatorState.getShieldDbBonus();
+  const shieldDbBonus = mookinator.state.getShieldDbBonus();
   if (shieldDbBonus > 0) {
-    const currentDodge = window.MookinatorState.getCalculatedAttributeValue('dodge');
+    const currentDodge = mookinator.state.getCalculatedAttributeValue('dodge');
     const finalDodge = currentDodge + shieldDbBonus;
     
     // Update the dodge field in the form
     mookApp.element.find('input[data-key="dodge"]').val(finalDodge).trigger("change");
     
-    // Update the dodge value in global state
-    const updatedAttributes = window.MookinatorState.getLastCalculatedAttributes();
+    // Update the dodge value in module state
+    const updatedAttributes = mookinator.state.getLastCalculatedAttributes();
     updatedAttributes.dodge = finalDodge;
-    window.MookinatorState.setLastCalculatedAttributes(updatedAttributes);
+    mookinator.state.setLastCalculatedAttributes(updatedAttributes);
     
   
   }
@@ -62,61 +63,54 @@ async function gerarMook(config, mookData) {
           return item.nome;
         }
       });
-    window.MookinatorFormOperations.preencherCampo('traits', traits.join('\n'));
+    mookinator.formOperations.preencherCampo('traits', traits.join('\n'));
   }
 
   // Fill notes
   if (mookData.notes) {
-    window.MookinatorFormOperations.preencherCampo('notes', mookData.notes.join('\n'));
+    mookinator.formOperations.preencherCampo('notes', mookData.notes.join('\n'));
   }
 
   
 }
 
 /**
- * Main function to initialize the Mook Generator
+ * Main function to initialize the Mook Generator - SIMPLIFIED WITHOUT PERSISTENCE
  */
 async function inicializarMookGenerator() {
+  // Ensure the module API is initialized before proceeding
+  const module = game.modules.get("mookinator");
+  if (!module.api) {
+    ui.notifications.error("Mookinator module not properly initialized. Please refresh and try again.");
+    return;
+  }
+
   GURPS.executeOTF("/mook");
   
-  const savedClasses = window.MookinatorDataLoader.getSavedClasses();
-  const savedClassButtonsHtml = window.MookinatorTemplates.generateSavedClassButtonsHtml(savedClasses);
-  const customButtonHtml = window.MookinatorTemplates.generateCustomButtonHtml();
-  const dialogContent = window.MookinatorTemplates.generateDialogTemplate(savedClassButtonsHtml, customButtonHtml);
+  const mookinator = module.api;
+  const customButtonHtml = mookinator.templates.generateCustomButtonHtml();
+  const dialogContent = mookinator.templates.generateDialogTemplate(customButtonHtml);
 
   const dialog = new Dialog({
     title: "Mookinator",
     content: dialogContent,
-    buttons: { fechar: { label: "Fechar" } },
+    buttons: { fechar: { label: "Close" } },
     render: (html) => {
       const handlers = {
-        loadAndPopulateForm: (html, jsonPath, className) => {
-          window.MookinatorDataLoader.loadAndPopulateForm(html, jsonPath, className, window.MookinatorState.setCurrentMookDataAndPath);
-        },
         loadCustomJSON: (html) => {
-          window.MookinatorDataLoader.loadCustomJSON(html, window.MookinatorState.setCurrentMookDataAndPath);
-        },
-        saveClass: (classData) => {
-          const success = window.MookinatorDataLoader.saveClass(classData);
-          if (success) {
-            window.MookinatorUIHandlers.refreshSavedClassesDisplay(html);
-          }
-          return success;
-        },
-        deleteClass: (classId) => {
-          return window.MookinatorDataLoader.deleteClass(classId);
+          mookinator.dataLoader.loadCustomJSON(html, mookinator.state.setCurrentMookDataAndPath.bind(mookinator.state));
         },
         gerarMook: gerarMook,
-        getCurrentMookData: window.MookinatorState.getCurrentMookData
+        getCurrentMookData: () => mookinator.state.getCurrentMookData()
       };
 
-      window.MookinatorUIHandlers.setupAllHandlers(html, handlers);
+      mookinator.uiHandlers.setupAllHandlers(html, handlers);
     },
     resizable: true,
     width: 600,
     height: 500,
     close: () => { 
-      window.MookinatorState.clearCurrentMookData();
+      mookinator.state.clearCurrentMookData();
     }
   });
 
@@ -126,33 +120,46 @@ async function inicializarMookGenerator() {
 // Module initialization
 Hooks.once("init", () => {
   console.log("Mookinator | module initialization started");
-  
-  game.settings.register("mookinator", "savedClasses", {
-    name: "Saved Classes",
-    hint: "Stored class configurations for the Mookinator module",
-    scope: "world",
-    config: false,
-    type: Array,
-    default: []
-  });
+  // No settings registration needed - no persistence
 });
 
 Hooks.once("ready", () => {
   console.log("Mookinator | Module is ready to use!");
   
-  // Ensure game.mookinator is properly initialized
+  // Get the module instance
+  const module = game.modules.get("mookinator");
+  
+  // Initialize the module API structure
+  if (!module.api) {
+    module.api = {};
+  }
+  
+  // Initialize all sub-modules with proper error handling
+  try {
+    module.api.state = new MookinatorState();
+    module.api.utils = new MookinatorUtils();
+    module.api.dataLoader = new MookinatorDataLoader();
+    module.api.formOperations = new MookinatorFormOperations();
+    module.api.templates = new MookinatorTemplates();
+    module.api.uiHandlers = new MookinatorUIHandlers();
+    
+    // Set up the main function
+    module.api.inicializarMookGenerator = inicializarMookGenerator;
+    
+    console.log("Mookinator | Module API initialized successfully:", module.api);
+  } catch (error) {
+    console.error("Mookinator | Error initializing module API:", error);
+    ui.notifications.error("Failed to initialize Mookinator module. Check console for details.");
+    return;
+  }
+  
+  // Ensure game.mookinator is properly initialized for backward compatibility
   if (!game.mookinator) {
     game.mookinator = {};
   }
   
   game.mookinator.inicializarMookGenerator = inicializarMookGenerator;
   
-  // Add to global scope for debugging
-  window.mookinator = game.mookinator;
-  
-  // ui.notifications.info("Mookinator carregado! Use game.mookinator.inicializarMookGenerator() em uma macro.");
-  
   // Debug log to verify initialization
-  console.log("Mookinator | game.mookinator:", game.mookinator);
-  console.log("Mookinator | Função disponível:", typeof game.mookinator.inicializarMookGenerator);
+  console.log("Mookinator | Função disponível:", typeof module.api.inicializarMookGenerator);
 });

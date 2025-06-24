@@ -1,9 +1,9 @@
 {
   "id": "mookinator",
   "title": "Mookinator",
-  "description": "Módulo personalizado para Foundry VTT com funcionalidades avançadas",
+  "description": "Advanced GURPS Mook Generator for Foundry VTT",
   
-  "version": "1.0.0",
+  "version": "1.0.2",
   "library": false,
 
   "compatibility": {
@@ -18,32 +18,17 @@
       "discord": "boifuba"
     }
   ],
-  "esmodules": [
-    "scripts/main.js",
-    "scripts/templates.js",
-    "scripts/ui-handlers.js",
-    "scripts/data-loader.js",
-    "scripts/mook-form-operations.js",
+  "scripts": [
     "scripts/mook-state.js",
     "scripts/mook-utils.js",
-    "data/default-class.json"
+    "scripts/data-loader.js",
+    "scripts/mook-form-operations.js",
+    "scripts/templates.js",
+    "scripts/ui-handlers.js",
+    "scripts/main.js"
   ],
   "styles": [
     "styles/mookinator.css"
-  ],
-  "packs": [
-    {
-      "name": "mookinator",
-      "label": "Mookinator",
-      "path": "packs/mookinator",
-      "type": "Macro",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      },
-      "system": "gurps",
-      "flags": {}
-    }
   ],
   "relationships": {
     "systems": [
@@ -63,7 +48,9 @@
   ],
   "socket": false,
   "url": "https://rolandodados.com.br",
-  "manifest": "https://raw.githubusercontent.com/Boifuba/mookinator/main/module.json",
-  "download": "https://github.com/Boifuba/mookinator/archive/refs/tags/download.zip",
+  "manifest": "https://github.com/Boifuba/mookinator/releases/download/1.0.2/module.json",  
+  "download": "https://github.com/Boifuba/mookinator/releases/download/1.0.2/mookinator.zip",
   "license": "MIT"
 }
+
+

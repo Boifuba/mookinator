@@ -28,27 +28,14 @@ There are two main ways to install Mookinator in Foundry VTT:
 2. Click on the **Add-on Modules** tab.  
 3. Click the **Install Module** button.  
 4. At the bottom of the window, paste the following manifest URL in the **Manifest URL** field:  
-   `https://raw.githubusercontent.com/Boifuba/mookinator/main/module.json`  
+   `https://github.com/Boifuba/mookinator/releases/download/1.0.2/module.json`  
 5. Click **Install**.  
 6. After installation, launch your GURPS world. Inside the world, go to **Game Settings** (gear icon in the right sidebar).  
 7. Click **Manage Modules**.  
 8. Find "Mookinator" in the list and check the box to enable it.  
 9. Click **Save Module Settings** at the bottom.
 
-### Method 2: Manual Download
 
-1. Download the ZIP file of the module:  
-   `https://github.com/Boifuba/mookinator/archive/refs/tags/download.zip`  
-2. Extract the contents of the ZIP to a folder.  
-3. Move the extracted folder (`mookinator-main` or similar) to Foundry’s modules directory:  
-   * **Windows**: `%LOCALAPPDATA%\FoundryVTT\Data\modules\`  
-   * **macOS**: `~/Library/Application Support/FoundryVTT/Data/modules/`  
-   * **Linux**: `~/.local/share/FoundryVTT/Data/modules/`  
-4. Restart Foundry VTT.  
-5. After restarting, launch your GURPS world and go to **Game Settings** (gear icon in the right sidebar).  
-6. Click **Manage Modules**.  
-7. Find "Mookinator" in the list and enable it.  
-8. Click **Save Module Settings**.
 
 ## How to Use
 

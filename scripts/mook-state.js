@@ -1,120 +1,127 @@
-// Mookinator State Management - Global state variables and functions
+// Mookinator State Management - Class-based state management
 
-// Global variables for current mook data
-let currentMookData = null;
-let currentMookPath = null;
-let currentMookTitle = null;
-let currentMookImageUrl = null;
-let currentSelectedClassData = null;
+class MookinatorState {
+  constructor() {
+    // Private variables for current mook data
+    this.currentMookData = null;
+    this.currentMookPath = null;
+    this.currentMookTitle = null;
+    this.currentMookImageUrl = null;
+    this.currentSelectedClassData = null;
 
-// NEW: Global variable to store last calculated attributes
-let lastCalculatedAttributes = {};
+    // Private variable to store last calculated attributes
+    this.lastCalculatedAttributes = {};
 
-// NEW: Global variable to store current shield DB bonus
-let currentShieldDbBonus = 0;
+    // Private variable to store current shield DB bonus
+    this.currentShieldDbBonus = 0;
+  }
 
-/**
- * Set current mook data and related information
- * @param {Object} data - Mook data object
- * @param {string} path - Path to the JSON file
- * @param {string} title - Title of the class
- * @param {string} imageUrl - URL of the class image
- */
-function setCurrentMookDataAndPath(data, path, title, imageUrl) {
-  currentMookData = window.MookinatorDataLoader.ensureDefaultCurrency(data);
-  currentMookPath = path;
-  currentMookTitle = title;
-  currentMookImageUrl = imageUrl;
-  
-  currentSelectedClassData = {
-    id: currentSelectedClassData?.id || foundry.utils.randomID(),
-    path: path,
-    title: title,
-    imageUrl: imageUrl
-  };
-  
-  console.log("🪙 Dados de moeda garantidos:", currentMookData?.currency);
+  /**
+   * Set current mook data and related information
+   * @param {Object} data - Mook data object
+   * @param {string} path - Path to the JSON file
+   * @param {string} title - Title of the class
+   * @param {string} imageUrl - URL of the class image
+   */
+  setCurrentMookDataAndPath(data, path, title, imageUrl) {
+    const mookinator = game.modules.get("mookinator").api;
+    this.currentMookData = mookinator.dataLoader.ensureDefaultCurrency(data);
+    this.currentMookPath = path;
+    this.currentMookTitle = title;
+    this.currentMookImageUrl = imageUrl;
+    
+    this.currentSelectedClassData = {
+      id: this.currentSelectedClassData?.id || foundry.utils.randomID(),
+      path: path,
+      title: title,
+      imageUrl: imageUrl
+    };
+    
+    console.log("🪙 Dados de moeda garantidos:", this.currentMookData?.currency);
+  }
+
+  /**
+   * Get current mook data and related information
+   * @returns {Object} Object containing current mook data and metadata
+   */
+  getCurrentMookData() {
+    return {
+      mookData: this.currentMookData,
+      path: this.currentMookPath,
+      title: this.currentMookTitle,
+      imageUrl: this.currentMookImageUrl
+    };
+  }
+
+  /**
+   * Clear all current mook data
+   */
+  clearCurrentMookData() {
+    this.currentMookData = null;
+    this.currentMookPath = null;
+    this.currentMookTitle = null;
+    this.currentMookImageUrl = null;
+    this.currentSelectedClassData = null;
+    this.lastCalculatedAttributes = {}; // Clear calculated attributes too
+    this.currentShieldDbBonus = 0; // Clear shield DB bonus too
+  }
+
+  /**
+   * Set last calculated attributes
+   * @param {Object} attributes - Object with calculated attribute values
+   */
+  setLastCalculatedAttributes(attributes) {
+    this.lastCalculatedAttributes = { ...attributes };
+    console.log("📊 Atributos calculados armazenados:", this.lastCalculatedAttributes);
+  }
+
+  /**
+   * Get last calculated attributes
+   * @returns {Object} Object with last calculated attribute values
+   */
+  getLastCalculatedAttributes() {
+    return { ...this.lastCalculatedAttributes };
+  }
+
+  /**
+   * Get specific calculated attribute value
+   * @param {string} attributeName - Name of the attribute
+   * @returns {number} Calculated attribute value or 0 if not found
+   */
+  getCalculatedAttributeValue(attributeName) {
+    return this.lastCalculatedAttributes[attributeName] || 0;
+  }
+
+  /**
+   * Set shield DB bonus value
+   * @param {number} value - Shield DB bonus value
+   */
+  setShieldDbBonus(value) {
+    this.currentShieldDbBonus = value || 0;
+    console.log(`🛡️ Shield DB bonus definido: ${this.currentShieldDbBonus}`);
+  }
+
+  /**
+   * Get shield DB bonus value
+   * @returns {number} Current shield DB bonus value
+   */
+  getShieldDbBonus() {
+    return this.currentShieldDbBonus;
+  }
+
+  /**
+   * Get current selected class data
+   * @returns {Object|null} Current selected class data
+   */
+  getCurrentSelectedClassData() {
+    return this.currentSelectedClassData;
+  }
+
+  /**
+   * Set current selected class data
+   * @param {Object} value - Class data object
+   */
+  setCurrentSelectedClassData(value) {
+    this.currentSelectedClassData = value;
+  }
 }
-
-/**
- * Get current mook data and related information
- * @returns {Object} Object containing current mook data and metadata
- */
-function getCurrentMookData() {
-  return {
-    mookData: currentMookData,
-    path: currentMookPath,
-    title: currentMookTitle,
-    imageUrl: currentMookImageUrl
-  };
-}
-
-/**
- * Clear all current mook data
- */
-function clearCurrentMookData() {
-  currentMookData = null;
-  currentMookPath = null;
-  currentMookTitle = null;
-  currentMookImageUrl = null;
-  currentSelectedClassData = null;
-  lastCalculatedAttributes = {}; // Clear calculated attributes too
-  currentShieldDbBonus = 0; // Clear shield DB bonus too
-}
-
-/**
- * Set last calculated attributes
- * @param {Object} attributes - Object with calculated attribute values
- */
-function setLastCalculatedAttributes(attributes) {
-  lastCalculatedAttributes = { ...attributes };
-  console.log("📊 Atributos calculados armazenados:", lastCalculatedAttributes);
-}
-
-/**
- * Get last calculated attributes
- * @returns {Object} Object with last calculated attribute values
- */
-function getLastCalculatedAttributes() {
-  return { ...lastCalculatedAttributes };
-}
-
-/**
- * Get specific calculated attribute value
- * @param {string} attributeName - Name of the attribute
- * @returns {number} Calculated attribute value or 0 if not found
- */
-function getCalculatedAttributeValue(attributeName) {
-  return lastCalculatedAttributes[attributeName] || 0;
-}
-
-/**
- * Set shield DB bonus value
- * @param {number} value - Shield DB bonus value
- */
-function setShieldDbBonus(value) {
-  currentShieldDbBonus = value || 0;
-  console.log(`🛡️ Shield DB bonus definido: ${currentShieldDbBonus}`);
-}
-
-/**
- * Get shield DB bonus value
- * @returns {number} Current shield DB bonus value
- */
-function getShieldDbBonus() {
-  return currentShieldDbBonus;
-}
-
-// Export functions and variables for use in other modules
-window.MookinatorState = {
-  setCurrentMookDataAndPath,
-  getCurrentMookData,
-  clearCurrentMookData,
-  setLastCalculatedAttributes,
-  getLastCalculatedAttributes,
-  getCalculatedAttributeValue,
-  setShieldDbBonus,
-  getShieldDbBonus,
-  get currentSelectedClassData() { return currentSelectedClassData; },
-  set currentSelectedClassData(value) { currentSelectedClassData = value; }
-};
