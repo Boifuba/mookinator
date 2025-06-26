@@ -3,7 +3,7 @@
   "title": "Mookinator",
   "description": "Advanced GURPS Mook Generator for Foundry VTT",
   
-  "version": "1.0.2",
+  "version": "1.0.3",
   "library": false,
 
   "compatibility": {
@@ -48,8 +48,8 @@
   ],
   "socket": false,
   "url": "https://rolandodados.com.br",
-  "manifest": "https://github.com/Boifuba/mookinator/releases/download/1.0.2/module.json",  
-  "download": "https://github.com/Boifuba/mookinator/releases/download/1.0.2/mookinator.zip",
+  "manifest": "https://github.com/Boifuba/mookinator/releases/download/packs/module.json",  
+  "download": "https://github.com/Boifuba/mookinator/releases/download/packs/mookinator.zip",
   "license": "MIT"
 }
 

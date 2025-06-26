@@ -260,16 +260,8 @@
   box-shadow: none;
 }
 
-/* Dialog Overrides */
-.dialog .window-content {
-  padding: 0;
-  overflow-y: auto;
-  max-height: 80vh;
-}
 
-.dialog .dialog-buttons {
-  display: none;
-}
+
 
 
 
