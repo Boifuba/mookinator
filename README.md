@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <img src="https://github.com/Boifuba/mookinator/blob/main/images/mookinator.png" alt="Logo" width="200">
+  <img src="https://github.com/Boifuba/mookinator/blob/main/images/mookinator.png" alt="Logo" width="400">
 </p>
 
 # Mookinator
@@ -16,7 +16,6 @@ GURPS doesn't have classes, but for Mookinator we’ll use this idea. If you wan
 ## Compatibility
 
 * **System**: GURPS  
-* **Minimum Foundry VTT**: 11  
 * **Tested Foundry VTT**: 13  
 * **Maximum Foundry VTT**: 13
 
@@ -70,10 +69,9 @@ Mookinator is an unofficial module for Foundry VTT and GURPS. GURPS is a product
 This project is licensed under the MIT License.
 
 
-## Need help? 
 
 ## Need help?
 
 Join us on [Discord](https://discord.gg/223PjGAM2Y), or create an [issue](https://github.com/Boifuba/mookinator/issues) here.
 
-> The Discord is in Portuguese, but you can ask in English — we understand you!
+> The Discord is in Portuguese, but you can make your questions in English — we understand you!
