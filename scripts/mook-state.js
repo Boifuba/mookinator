@@ -14,6 +14,14 @@ class MookinatorState {
 
     // Private variable to store current shield DB bonus
     this.currentShieldDbBonus = 0;
+
+    // Private variables for name generator
+    this.generatedNpcName = null;
+    this.nameGeneratorSettings = {
+      nation: 'megalos',
+      gender: 'both',
+      namePart: 'full'
+    };
   }
 
   /**
@@ -36,8 +44,6 @@ class MookinatorState {
       title: title,
       imageUrl: imageUrl
     };
-    
-    console.log("🪙 Dados de moeda garantidos:", this.currentMookData?.currency);
   }
 
   /**
@@ -64,6 +70,8 @@ class MookinatorState {
     this.currentSelectedClassData = null;
     this.lastCalculatedAttributes = {}; // Clear calculated attributes too
     this.currentShieldDbBonus = 0; // Clear shield DB bonus too
+    // NOTE: We intentionally do NOT clear this.generatedNpcName here
+    // so that generated names persist across mook data changes
   }
 
   /**
@@ -72,7 +80,6 @@ class MookinatorState {
    */
   setLastCalculatedAttributes(attributes) {
     this.lastCalculatedAttributes = { ...attributes };
-    console.log("📊 Atributos calculados armazenados:", this.lastCalculatedAttributes);
   }
 
   /**
@@ -98,7 +105,6 @@ class MookinatorState {
    */
   setShieldDbBonus(value) {
     this.currentShieldDbBonus = value || 0;
-    console.log(`🛡️ Shield DB bonus definido: ${this.currentShieldDbBonus}`);
   }
 
   /**
@@ -107,6 +113,38 @@ class MookinatorState {
    */
   getShieldDbBonus() {
     return this.currentShieldDbBonus;
+  }
+
+  /**
+   * Set the currently generated NPC name
+   * @param {string} name - The generated name
+   */
+  setGeneratedNpcName(name) {
+    this.generatedNpcName = name;
+  }
+
+  /**
+   * Get the currently generated NPC name
+   * @returns {string|null} The generated name
+   */
+  getGeneratedNpcName() {
+    return this.generatedNpcName;
+  }
+
+  /**
+   * Set name generator settings
+   * @param {Object} settings - Settings object with nation, gender, namePart
+   */
+  setNameGeneratorSettings(settings) {
+    this.nameGeneratorSettings = { ...this.nameGeneratorSettings, ...settings };
+  }
+
+  /**
+   * Get name generator settings
+   * @returns {Object} Current name generator settings
+   */
+  getNameGeneratorSettings() {
+    return { ...this.nameGeneratorSettings };
   }
 
   /**

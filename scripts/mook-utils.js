@@ -138,8 +138,6 @@ class MookinatorUtils {
    * @returns {string} Formatted coin distribution string
    */
   distributeCoins(totalValue, currencyData) {
-    console.log("🪙 Distribuindo moedas - Valor total:", totalValue, "Dados de moeda:", currencyData);
-    
     if (!currencyData || !Array.isArray(currencyData) || totalValue <= 0) {
       console.warn("⚠️ Dados de moeda inválidos ou valor zero");
       return "No coins";
@@ -178,13 +176,10 @@ class MookinatorUtils {
         
         const capitalizedName = currency.name.charAt(0).toUpperCase() + currency.name.slice(1);
         result.push(`${capitalizedName} Coins; ${quantity}; $${totalCost}; ${totalCurrencyWeight.toFixed(2)} ${currency.unit}`);
-        
-        console.log(`🪙 ${capitalizedName}: ${quantity} moedas, valor $${totalCost}`);
       }
     });
 
     const finalResult = result.length > 0 ? result.join('\n') : "No coins";
-    console.log("🪙 Resultado final da distribuição:", finalResult);
     return finalResult;
   }
 
@@ -409,5 +404,69 @@ class MookinatorUtils {
     });
     
     return output;
+  }
+
+  /**
+   * Load saved configuration from game settings
+   * @returns {Object} Saved configuration object
+   */
+  loadSavedConfig() {
+    const attributes = ['st', 'dx', 'iq', 'ht', 'hp', 'will', 'per', 'fp', 'shield', 'parry', 'speed', 'move', 'sm', 'dr', 'dodge', 'coins'];
+    const sections = ['skills', 'ranged', 'melee', 'spells'];
+    
+    const savedConfig = {
+      atributos: {},
+      traitsQty: game.settings.get("mookinator", "traitsQty")
+    };
+    
+    // Load attribute settings
+    attributes.forEach(attr => {
+      savedConfig.atributos[attr] = {
+        min: game.settings.get("mookinator", `${attr}Min`),
+        max: game.settings.get("mookinator", `${attr}Max`)
+      };
+    });
+    
+    // Load section settings
+    sections.forEach(section => {
+      savedConfig[section] = {
+        qty: game.settings.get("mookinator", `${section}Qty`),
+        min: game.settings.get("mookinator", `${section}Min`),
+        max: game.settings.get("mookinator", `${section}Max`)
+      };
+    });
+    
+    return savedConfig;
+  }
+
+  /**
+   * Save current configuration to game settings
+   * @param {Object} config - Configuration object to save
+   */
+  saveCurrentConfig(config) {
+    const attributes = ['st', 'dx', 'iq', 'ht', 'hp', 'will', 'per', 'fp', 'shield', 'parry', 'speed', 'move', 'sm', 'dr', 'dodge', 'coins'];
+    const sections = ['skills', 'ranged', 'melee', 'spells'];
+    
+    // Save attribute settings
+    attributes.forEach(attr => {
+      if (config.atributos && config.atributos[attr]) {
+        game.settings.set("mookinator", `${attr}Min`, config.atributos[attr].min);
+        game.settings.set("mookinator", `${attr}Max`, config.atributos[attr].max);
+      }
+    });
+    
+    // Save section settings
+    sections.forEach(section => {
+      if (config[section]) {
+        game.settings.set("mookinator", `${section}Qty`, config[section].qty);
+        game.settings.set("mookinator", `${section}Min`, config[section].min);
+        game.settings.set("mookinator", `${section}Max`, config[section].max);
+      }
+    });
+    
+    // Save traits quantity
+    if (typeof config.traitsQty === 'number') {
+      game.settings.set("mookinator", "traitsQty", config.traitsQty);
+    }
   }
 }
