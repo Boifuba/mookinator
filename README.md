@@ -74,4 +74,9 @@ This project is licensed under the MIT License.
 
 Join us on [Discord](https://discord.gg/223PjGAM2Y), or create an [issue](https://github.com/Boifuba/mookinator/issues) here.
 
+
+## Do want to support me ? 
+
+Buy me a [coffee](https://github.com/sponsors/Boifuba)
+
 > The Discord is in Portuguese, but you can make your questions in English — we understand you!
