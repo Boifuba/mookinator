@@ -2,21 +2,77 @@
 
 class MookinatorUIHandlers {
   /**
-   * Handle file loading button click - SIMPLIFIED FOR DIRECT LOADING ONLY
+   * Setup handlers for the name generator buttons
+   * @param {jQuery} html - jQuery object of the dialog HTML
+   * @param {Object} mookinatorState - The MookinatorState instance
+   */
+  setupNameGeneratorHandlers(html, mookinatorState) {
+    // Handler for the gear button (open settings dialog)
+    html.find("#open-name-generator-settings-btn").on("click", async () => {
+      try {
+        const mookinator = game.modules.get("mookinator").api;
+        const nameGenerator = new mookinator.NameGenerator();
+        
+        nameGenerator.openDialog();
+      } catch (error) {
+        console.error("Error opening name generator dialog:", error);
+        ui.notifications.error("Error opening name generator dialog");
+      }
+    });
+
+    // Handler for the dice button (generate random name)
+    html.find("#generate-name-dice-btn").on("click", async () => {
+      try {
+        const mookinator = game.modules.get("mookinator").api;
+        
+        // Get current settings from state
+        const settings = mookinatorState.getNameGeneratorSettings();
+        
+        const generatedName = mookinator.NameGenerator.generateRandomName(
+          settings.nation, 
+          settings.gender, 
+          settings.namePart
+        );
+        
+        if (generatedName) {
+          html.find("#npc-input-name").val(generatedName).trigger("change");
+          mookinatorState.setGeneratedNpcName(generatedName);
+          
+          // Inject name into /mook character sheet input field
+          const mookApp = Object.values(ui.windows).find(w => w.title?.includes("Mook Generator"));
+          if (mookApp) {
+            // Find the specific name input field with id="npc-input-name" and inject the generated name
+            const nameField = mookApp.element.find('#npc-input-name[data-key="name"]');
+            if (nameField.length > 0) {
+              nameField.val(generatedName).trigger("change");
+              console.log(`🎯 Nome "${generatedName}" injetado no campo #npc-input-name da ficha /mook`);
+            } else {
+              console.warn("Campo #npc-input-name não encontrado na ficha /mook");
+            }
+          } else {
+            console.warn("Ficha /mook não encontrada");
+          }
+          
+        } else {
+          ui.notifications.warn("Could not generate a name with current settings.");
+        }
+      } catch (error) {
+        console.error("Error generating random name:", error);
+        ui.notifications.error("Error generating random name");
+      }
+    });
+  }
+
+  /**
+   * Handle file loading button click - UPDATED FOR NEW BUTTON LOCATION
    * @param {jQuery} html - jQuery object of the dialog HTML
    * @param {Function} loadCustomJSONHandler - Function to handle custom JSON loading
    */
   setupFileLoadingHandler(html, loadCustomJSONHandler) {
     const mookinator = game.modules.get("mookinator").api;
     
-    html.on("click", ".custom-btn", function (e) {
+    html.on("click", ".load-btn", function (e) {
       e.preventDefault();
-      
-      // Remove selected class from all buttons
-      html.find(".class-btn").removeClass("selected");
-      
-      // Add selected class to clicked button
-      $(this).addClass("selected");
       
       // Handle custom JSON/GCS loading
       mookinator.state.setCurrentSelectedClassData(null);
@@ -46,6 +102,8 @@ class MookinatorUIHandlers {
    * @param {Function} getCurrentMookData - Function to get current mook data
    */
   setupGenerateButtonHandler(html, gerarMook, getCurrentMookData) {
+    const mookinator = game.modules.get("mookinator").api;
+    
     html.find("#gerar-btn").on("click", async () => {
       try {
         const currentData = getCurrentMookData();
@@ -59,6 +117,13 @@ class MookinatorUIHandlers {
         const config = this.extractFormConfig(form);
         
         await gerarMook(config, currentData.mookData);
+        
+        // Save current configuration after successful generation
+        try {
+          mookinator.utils.saveCurrentConfig(config);
+        } catch (saveError) {
+          console.warn("Erro ao salvar configurações após geração:", saveError);
+        }
       } catch (error) {
         console.error("Error in generate button handler:", error);
         ui.notifications.error("Error generating mook: " + error.message);
@@ -67,7 +132,7 @@ class MookinatorUIHandlers {
   }
 
   /**
-   * Extract configuration from form elements - UPDATED: Added parry
+   * Extract configuration from form elements - UPDATED: Added parry and mookQty
    * @param {HTMLFormElement} form - The form element
    * @returns {Object} Configuration object
    */
@@ -109,6 +174,7 @@ class MookinatorUIHandlers {
         max: getInt("spellsMax", 14) 
       },
       traitsQty: getInt("traitsQty", 5),
+      mookQty: getInt("mookQty", 1),
     };
 
     // Add all attributes to config - UPDATED: Added parry
@@ -127,7 +193,7 @@ class MookinatorUIHandlers {
   }
 
   /**
-   * Setup all UI event handlers - SIMPLIFIED FOR FILE LOADING ONLY
+   * Setup all UI event handlers - UPDATED FOR NEW BUTTON LAYOUT
    * @param {jQuery} html - jQuery object of the dialog HTML
    * @param {Object} handlers - Object containing handler functions
    */
@@ -148,8 +214,7 @@ class MookinatorUIHandlers {
 
       this.setupFileLoadingHandler(html, handlers.loadCustomJSON);
       this.setupGenerateButtonHandler(html, handlers.gerarMook, handlers.getCurrentMookData);
-      
-      console.log("Mookinator | All UI handlers set up successfully");
+      this.setupNameGeneratorHandlers(html, game.modules.get("mookinator").api.state);
     } catch (error) {
       console.error("Error setting up UI handlers:", error);
       ui.notifications.error("Error initializing UI handlers: " + error.message);

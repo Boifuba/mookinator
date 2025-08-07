@@ -5,7 +5,7 @@
  * This checks for module availability and waits if needed
  */
 async function safeMookinatorLauncher() {
-  // Check if module exists hahahahaha
+  // Check if module exists
   const module = game.modules.get("mookinator");
   if (!module) {
     console.error("Mookinator module not found");
@@ -55,7 +55,7 @@ async function safeMookinatorLauncher() {
 window.safeMookinatorLauncher = safeMookinatorLauncher;
 
 /**
- * Main function to generate the Mook - UPDATED: Only trigger native button when quantity > 1
+ * Main function to generate the Mook - UPDATED WITH ST-BASED DAMAGE CALCULATION, SHIELD ATTRIBUTE, DB BONUS, AND MULTIPLE MOOK GENERATION
  * @param {Object} config - Configuration object
  * @param {Object} mookData - Mook data object
  */
@@ -69,35 +69,6 @@ async function gerarMook(config, mookData) {
   const mookinator = game.modules.get("mookinator").api;
 
   const numberOfMooksToGenerate = config.mookQty || 1; // Get quantity from config, default to 1
-
-  // NEW: Add confirmation dialog when quantity > 1
-  if (numberOfMooksToGenerate > 1) {
-    const confirmed = await new Promise((resolve) => {
-      new Dialog({
-        title: "Confirmatiom",
-        content: `<p>Do you really want to generate <strong>${numberOfMooksToGenerate}</strong> NPCs?</p>`,
-        buttons: {
-          yes: {
-            icon: '<i class="fas fa-check"></i>',
-            label: "Yes",
-            callback: () => resolve(true)
-          },
-          no: {
-            icon: '<i class="fas fa-times"></i>',
-            label: "No",
-            callback: () => resolve(false)
-          }
-        },
-        default: "no",
-        close: () => resolve(false)
-      }).render(true);
-    });
-
-    if (!confirmed) {
-      ui.notifications.info("NPC's generation cancelled.");
-      return;
-    }
-  }
 
   for (let i = 0; i < numberOfMooksToGenerate; i++) {
     console.log(`Generating Mook ${i + 1} of ${numberOfMooksToGenerate}...`);
@@ -205,23 +176,15 @@ async function gerarMook(config, mookData) {
       mookinator.formOperations.preencherCampo('notes', mookData.notes.join('\n'));
     }
 
-    // UPDATED: Only trigger native button when quantity > 1
-    if (numberOfMooksToGenerate > 1) {
-      await triggerNativeCreateMookButton();
-    }
+    // NEW: Trigger the native "Create Mook" button after each mook is generated
+    await triggerNativeCreateMookButton();
 
     // Add a small delay between mook generations to allow the system to process
     if (i < numberOfMooksToGenerate - 1) {
       await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
     }
   }
-
-  // Final notification
-  if (numberOfMooksToGenerate === 1) {
-    ui.notifications.info("Mook data generated and injected successfully!");
-  } else {
-    ui.notifications.info(`Finished generating ${numberOfMooksToGenerate} mooks.`);
-  }
+  ui.notifications.info(`Finished generating ${numberOfMooksToGenerate} mooks.`);
 }
 
 /**
