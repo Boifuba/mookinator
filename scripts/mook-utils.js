@@ -407,7 +407,11 @@ class MookinatorUtils {
   }
 
   /**
+<<<<<<< HEAD
    * Load saved configuration from game settings - UPDATED WITH MOOK QTY
+=======
+   * Load saved configuration from game settings
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
    * @returns {Object} Saved configuration object
    */
   loadSavedConfig() {
@@ -416,8 +420,12 @@ class MookinatorUtils {
     
     const savedConfig = {
       atributos: {},
+<<<<<<< HEAD
       traitsQty: game.settings.get("mookinator", "traitsQty"),
       mookQty: game.settings.get("mookinator", "mookQty")
+=======
+      traitsQty: game.settings.get("mookinator", "traitsQty")
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
     };
     
     // Load attribute settings
@@ -441,7 +449,11 @@ class MookinatorUtils {
   }
 
   /**
+<<<<<<< HEAD
    * Save current configuration to game settings - UPDATED WITH MOOK QTY
+=======
+   * Save current configuration to game settings
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
    * @param {Object} config - Configuration object to save
    */
   saveCurrentConfig(config) {
@@ -469,10 +481,13 @@ class MookinatorUtils {
     if (typeof config.traitsQty === 'number') {
       game.settings.set("mookinator", "traitsQty", config.traitsQty);
     }
+<<<<<<< HEAD
 
     // NEW: Save mook quantity
     if (typeof config.mookQty === 'number') {
       game.settings.set("mookinator", "mookQty", config.mookQty);
     }
+=======
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
   }
 }

@@ -442,11 +442,14 @@ class MookinatorDataLoader {
       // Prioritize saved config over mookData defaults
       const traitsQtyValue = savedConfig?.traitsQty ?? mookData.traits.qty;
       html.find(`input[name="traitsQty"]`).val(traitsQtyValue);
+<<<<<<< HEAD
     }
     
     // Fill mook quantity
     if (savedConfig?.mookQty) {
       html.find(`input[name="mookQty"]`).val(savedConfig.mookQty);
+=======
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
     }
     
     if (mookData.notes) {
@@ -455,7 +458,11 @@ class MookinatorDataLoader {
   }
 
   /**
+<<<<<<< HEAD
    * Fill form with saved configurations only (no mook data) - UPDATED WITH MOOK QTY
+=======
+   * Fill form with saved configurations only (no mook data)
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
    * @param {jQuery} html - jQuery object of the dialog HTML
    * @param {Object} savedConfig - Saved configuration object
    */
@@ -483,11 +490,14 @@ class MookinatorDataLoader {
     if (typeof savedConfig.traitsQty === 'number') {
       html.find(`input[name="traitsQty"]`).val(savedConfig.traitsQty);
     }
+<<<<<<< HEAD
 
     // Fill mook quantity
     if (typeof savedConfig.mookQty === 'number') {
       html.find(`input[name="mookQty"]`).val(savedConfig.mookQty);
     }
+=======
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
   }
   /**
    * Load custom JSON or GCS file using browser file picker - UPDATED TO SHOW PROPER STATUS

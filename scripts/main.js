@@ -5,7 +5,11 @@
  * This checks for module availability and waits if needed
  */
 async function safeMookinatorLauncher() {
+<<<<<<< HEAD
   // Check if module exists hahahahaha
+=======
+  // Check if module exists
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
   const module = game.modules.get("mookinator");
   if (!module) {
     console.error("Mookinator module not found");
@@ -55,7 +59,11 @@ async function safeMookinatorLauncher() {
 window.safeMookinatorLauncher = safeMookinatorLauncher;
 
 /**
+<<<<<<< HEAD
  * Main function to generate the Mook - UPDATED: Only trigger native button when quantity > 1
+=======
+ * Main function to generate the Mook - UPDATED WITH ST-BASED DAMAGE CALCULATION, SHIELD ATTRIBUTE, AND DB BONUS
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
  * @param {Object} config - Configuration object
  * @param {Object} mookData - Mook data object
  */
@@ -68,6 +76,7 @@ async function gerarMook(config, mookData) {
 
   const mookinator = game.modules.get("mookinator").api;
 
+<<<<<<< HEAD
   const numberOfMooksToGenerate = config.mookQty || 1; // Get quantity from config, default to 1
 
   // NEW: Add confirmation dialog when quantity > 1
@@ -214,6 +223,102 @@ async function gerarMook(config, mookData) {
     if (i < numberOfMooksToGenerate - 1) {
       await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
     }
+=======
+  // NEW: Read name directly from input field, generate only if empty
+  let currentName = mookApp.element.find('input[data-key="name"]').val();
+  
+  // If the name field is empty, generate a new name
+  if (!currentName || currentName.trim() === '') {
+    const nameSettings = mookinator.state.getNameGeneratorSettings();
+    const newName = mookinator.NameGenerator.generateRandomName(
+      nameSettings.nation,
+      nameSettings.gender,
+      nameSettings.namePart
+    );
+    
+    if (newName) {
+      mookApp.element.find('input[data-key="name"]').val(newName).trigger("change");
+      mookinator.state.setGeneratedNpcName(newName);
+      
+      // Update the native GURPS sheet with the generated name
+      await updateNativeMookName(newName);
+      currentName = newName;
+    }
+  } else {
+    // If name already exists, also update the native sheet
+    // Pequeno atraso para garantir que o campo do Mookinator esteja totalmente atualizado
+    // antes de tentar atualizar a ficha nativa.
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await updateNativeMookName(currentName);
+  }
+
+  // Fill attributes first (including ST) with new calculation logic
+  mookinator.formOperations.preencherAtributos(config, mookData.atributos);
+  
+  // Small delay to ensure fields are updated
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  // CRITICAL FIX: Get the calculated ST and Shield values from module state instead of form fields
+  const calculatedAttributes = mookinator.state.getLastCalculatedAttributes();
+  const stValue = calculatedAttributes.st || 10;
+  const shieldAttributeValue = calculatedAttributes.shield || 0;
+  
+  // Fill all skill types with ST-based damage calculation and shield attribute
+  mookinator.formOperations.preencherSkills(mookData.meleeSkills, 'melee', config.melee, stValue, shieldAttributeValue);
+  mookinator.formOperations.preencherSkills(mookData.rangedSkills, 'ranged', config.ranged, stValue);
+  mookinator.formOperations.preencherSkills(mookData.skillsList, 'skills', config.skills);
+  mookinator.formOperations.preencherSkills(mookData.spellsList, 'spells', config.spells);
+
+  // CRITICAL: Apply DB bonus to Dodge after melee skills are processed
+  const shieldDbBonus = mookinator.state.getShieldDbBonus();
+  if (shieldDbBonus > 0) {
+    const currentDodge = mookinator.state.getCalculatedAttributeValue('dodge');
+    const finalDodge = currentDodge + shieldDbBonus;
+    
+    // Update the dodge field in the form
+    mookApp.element.find('input[data-key="dodge"]').val(finalDodge).trigger("change");
+    
+    // Update the dodge value in module state
+    const updatedAttributes = mookinator.state.getLastCalculatedAttributes();
+    updatedAttributes.dodge = finalDodge;
+    mookinator.state.setLastCalculatedAttributes(updatedAttributes);
+  }
+
+  // Fill traits
+  if (mookData.traitsList && Array.isArray(mookData.traitsList)) {
+    // First, add all mandatory traits
+    const mandatoryTraits = mookData.traitsList.filter(item => item.isMandatory === true);
+    const selectedTraits = [];
+    
+    if (mandatoryTraits.length > 0) {
+      mandatoryTraits.forEach(item => {
+        const formattedTrait = item.valor && item.valor.toString().trim() !== '' 
+          ? `${item.nome} ${item.valor}` 
+          : item.nome;
+        selectedTraits.push(formattedTrait);
+      });
+    }
+    
+    // Then fill remaining slots with random non-mandatory traits
+    if (selectedTraits.length < config.traitsQty) {
+      const nonMandatoryTraits = mookData.traitsList.filter(item => !item.isMandatory);
+      const remainingSlots = config.traitsQty - selectedTraits.length;
+      
+      const randomTraits = nonMandatoryTraits
+        .sort(() => 0.5 - Math.random())
+        .slice(0, remainingSlots)
+        .map(item => {
+          const formattedTrait = item.valor && item.valor.toString().trim() !== '' 
+            ? `${item.nome} ${item.valor}` 
+            : item.nome;
+          return formattedTrait;
+        });
+      
+      selectedTraits.push(...randomTraits);
+    }
+    
+    mookinator.formOperations.preencherCampo('traits', selectedTraits.join('\n'));
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
   }
 
   // Final notification
@@ -235,11 +340,26 @@ async function updateNativeMookName(name) {
   }
 
   try {
+<<<<<<< HEAD
     // Use the same mookApp window that we're already injecting data into
     const mookApp = Object.values(ui.windows).find(w => w.title?.includes("Mook Generator"));
 
     if (!mookApp) {
       console.warn("Mookinator | Mook Generator window not found");
+=======
+    // Find the native GURPS character sheet among open windows
+    const nativeSheet = Object.values(ui.windows).find(w => {
+      // Look for GURPS character sheets
+      return w.constructor.name === 'GurpsActorSheet' || 
+             w.constructor.name === 'GurpsActor' ||
+             (w.actor && w.actor.type === 'character') ||
+             (w.title && w.title.includes('Character')) ||
+             w.element?.hasClass?.('gurps');
+    });
+
+    if (!nativeSheet) {
+      console.warn("Mookinator | Native GURPS sheet not found. Make sure a character sheet is open.");
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
       return;
     }
 
@@ -250,15 +370,23 @@ async function updateNativeMookName(name) {
       '.sheet-header input[name="name"]',
       '.charname input',
       'input.charname',
+<<<<<<< HEAD
       '.character-name input',
       '#npc-input-name',
       'input[data-key="name"]',
       '.gcs-input[data-key="name"]'
+=======
+      '.character-name input'
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
     ];
 
     let nameField = null;
     for (const selector of nameSelectors) {
+<<<<<<< HEAD
       nameField = mookApp.element.find(selector);
+=======
+      nameField = nativeSheet.element.find(selector);
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
       if (nameField.length > 0) {
         console.log(`Mookinator | Found native name field using selector: ${selector}`);
         break;
@@ -267,9 +395,13 @@ async function updateNativeMookName(name) {
 
     if (!nameField || nameField.length === 0) {
       console.warn("Mookinator | Could not find name field in native GURPS sheet");
+<<<<<<< HEAD
       console.log("Mookinator | Available input fields:", mookApp.element.find('input').map((i, el) => el.name || el.className).get());
       console.log("Mookinator | Available input fields with IDs:", mookApp.element.find('input[id]').map((i, el) => `#${el.id}`).get());
       console.log("Mookinator | Available input fields with data-key:", mookApp.element.find('input[data-key]').map((i, el) => `[data-key="${el.getAttribute('data-key')}"]`).get());
+=======
+      console.log("Mookinator | Available input fields:", nativeSheet.element.find('input').map((i, el) => el.name || el.className).get());
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
       return;
     }
 
@@ -279,7 +411,10 @@ async function updateNativeMookName(name) {
     // Trigger change event to ensure the sheet updates properly
     nameField.trigger('change');
     nameField.trigger('blur');
+<<<<<<< HEAD
     nameField.trigger('input');
+=======
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
 
     console.log(`Mookinator | Successfully updated native sheet name to: ${name}`);
     
@@ -289,6 +424,7 @@ async function updateNativeMookName(name) {
 }
 
 /**
+<<<<<<< HEAD
  * Trigger the "Create Mook" button on the native GURPS sheet.
  */
 async function triggerNativeCreateMookButton() {
@@ -402,6 +538,8 @@ async function triggerNativeCreateMookButton() {
 }
 
 /**
+=======
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
  * Main function to initialize the Mook Generator - UPDATED WITH CLOSE BUTTON REMOVAL
  */
 async function inicializarMookGenerator() {
@@ -562,6 +700,7 @@ Hooks.once("init", () => {
     default: 4
   });
   
+<<<<<<< HEAD
   // NEW: Register mook quantity setting
   game.settings.register("mookinator", "mookQty", {
     name: "Mook Quantity",
@@ -571,6 +710,8 @@ Hooks.once("init", () => {
     default: 1
   });
   
+=======
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
   console.log("Mookinator | Settings registered");
 });
 
@@ -624,4 +765,8 @@ Hooks.once("ready", () => {
   game.mookinator.inicializarMookGenerator = inicializarMookGenerator;
   
   console.log("Mookinator | Module fully initialized and ready to use");
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718

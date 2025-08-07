@@ -3,7 +3,11 @@
   "title": "Mookinator",
   "description": "Advanced GURPS Mook Generator for Foundry VTT",
   
+<<<<<<< HEAD
   "version": "1.0.8",
+=======
+  "version": "1.0.7",
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
   "library": false,
 
   "compatibility": {

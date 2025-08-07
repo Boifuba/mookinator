@@ -70,6 +70,7 @@ class MookinatorTemplates {
   }
 
   /**
+<<<<<<< HEAD
    * Generate mook quantity input row HTML
    * @returns {string} HTML string for mook quantity input
    */
@@ -85,6 +86,8 @@ class MookinatorTemplates {
   }
 
   /**
+=======
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
    * Generate the name input field and associated buttons
    * @returns {string} HTML string for the name input and buttons
    */
@@ -104,7 +107,11 @@ class MookinatorTemplates {
   }
 
   /**
+<<<<<<< HEAD
    * Generate the complete dialog HTML template - UPDATED WITH SIDE-BY-SIDE BUTTONS AND MOOK QUANTITY
+=======
+   * Generate the complete dialog HTML template - UPDATED WITH SIDE-BY-SIDE BUTTONS
+>>>>>>> 3c7ee85c3af0fcbcb8ed2635615e104442c46718
    * @param {string} customButtonHtml - HTML for custom button
    * @returns {string} Complete HTML template for the dialog
    */
