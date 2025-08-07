@@ -3,11 +3,11 @@
   "title": "Mookinator",
   "description": "Advanced GURPS Mook Generator for Foundry VTT",
   
-  "version": "1.0.3",
+  "version": "1.0.8",
   "library": false,
 
   "compatibility": {
-    "minimum": "11",
+    "minimum": "13",
     "verified": "13",
     "maximum": "13"  
   },
@@ -19,13 +19,17 @@
     }
   ],
   "scripts": [
-    "scripts/mook-state.js",
-    "scripts/mook-utils.js",
-    "scripts/data-loader.js",
-    "scripts/mook-form-operations.js",
-    "scripts/templates.js",
-    "scripts/ui-handlers.js",
-    "scripts/main.js"
+      	"scripts/main.js",
+        "scripts/mook-state.js",
+        "scripts/mook-utils.js",
+        "scripts/data-loader.js",
+        "scripts/mook-form-operations.js",
+        "scripts/templates.js",
+        "scripts/ui-handlers.js",
+        "scripts/name-generator.js",
+        "scripts/name-dialog.js",
+        "scripts/name-data.js"
+
   ],
   "styles": [
     "styles/mookinator.css"
@@ -39,13 +43,21 @@
       }
     ]
   },
-  "languages": [
+  "packs": [
     {
-      "lang": "pt-BR",
-      "name": "Português (Brasil)",
-      "path": "lang/pt-BR.json"
+      "name": "mookinator",
+      "label": "Mookinator",
+      "path": "packs/mookinator",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "gurps",
+      "flags": {}
     }
   ],
+
   "socket": false,
   "url": "https://rolandodados.com.br",
   "manifest": "https://github.com/Boifuba/mookinator/releases/download/packs/module.json",  

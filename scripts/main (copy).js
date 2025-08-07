@@ -55,7 +55,7 @@ async function safeMookinatorLauncher() {
 window.safeMookinatorLauncher = safeMookinatorLauncher;
 
 /**
- * Main function to generate the Mook - UPDATED: Only trigger native button when quantity > 1
+ * Main function to generate the Mook - UPDATED WITH ST-BASED DAMAGE CALCULATION, SHIELD ATTRIBUTE, DB BONUS, AND MULTIPLE MOOK GENERATION
  * @param {Object} config - Configuration object
  * @param {Object} mookData - Mook data object
  */
@@ -176,23 +176,15 @@ async function gerarMook(config, mookData) {
       mookinator.formOperations.preencherCampo('notes', mookData.notes.join('\n'));
     }
 
-    // UPDATED: Only trigger native button when quantity > 1
-    if (numberOfMooksToGenerate > 1) {
-      await triggerNativeCreateMookButton();
-    }
+    // NEW: Trigger the native "Create Mook" button after each mook is generated
+    await triggerNativeCreateMookButton();
 
     // Add a small delay between mook generations to allow the system to process
     if (i < numberOfMooksToGenerate - 1) {
       await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
     }
   }
-
-  // Final notification
-  if (numberOfMooksToGenerate === 1) {
-    ui.notifications.info("Mook data generated and injected successfully!");
-  } else {
-    ui.notifications.info(`Finished generating ${numberOfMooksToGenerate} mooks.`);
-  }
+  ui.notifications.info(`Finished generating ${numberOfMooksToGenerate} mooks.`);
 }
 
 /**

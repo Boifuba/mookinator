@@ -2,6 +2,75 @@
 
 class MookinatorFormOperations {
   /**
+   * Parse difficulty string to extract base attribute and modifier
+   * @param {string} difficulty - Difficulty string like "iq/e", "dx/a", "ht/h", "st/vh"
+   * @returns {object} Object with baseAttribute and modifier
+   */
+  parseDifficulty(difficulty) {
+    if (!difficulty || typeof difficulty !== 'string') {
+      return { baseAttribute: null, modifier: 0 };
+    }
+
+    const parts = difficulty.toLowerCase().split('/');
+    if (parts.length !== 2) {
+      return { baseAttribute: null, modifier: 0 };
+    }
+
+    const baseAttribute = parts[0]; // st, dx, iq, ht
+    const difficultyLevel = parts[1]; // e, a, h, vh
+
+    // Convert difficulty level to modifier
+    const difficultyModifiers = {
+      'e': 0,   // Easy
+      'a': -1,  // Average
+      'h': -2,  // Hard
+      'vh': -3  // Very Hard
+    };
+
+    const modifier = difficultyModifiers[difficultyLevel] || 0;
+
+    return { baseAttribute, modifier };
+  }
+
+  /**
+   * Find the best default modifier for a weapon from its defaults array
+   * @param {Array} defaults - Array of default objects from weapon data
+   * @returns {object} Object with baseAttribute and modifier for the best default
+   */
+  findBestWeaponDefault(defaults) {
+    if (!defaults || !Array.isArray(defaults) || defaults.length === 0) {
+      return { baseAttribute: 'dx', modifier: -4 }; // Fallback to DX-4 if no defaults
+    }
+
+    let bestDefault = null;
+    let bestModifier = -999; // Start with very negative value
+
+    defaults.forEach(defaultItem => {
+      // Only consider attribute-based defaults (dx, st, iq, ht), not skill-based ones
+      if (defaultItem.type && ['dx', 'st', 'iq', 'ht'].includes(defaultItem.type.toLowerCase())) {
+        const modifier = defaultItem.modifier || 0;
+        
+        // Find the least negative (best) modifier
+        if (modifier > bestModifier) {
+          bestModifier = modifier;
+          bestDefault = {
+            baseAttribute: defaultItem.type.toLowerCase(),
+            modifier: modifier
+          };
+        }
+      }
+    });
+
+    // If no attribute-based default found, use DX-4 as fallback
+    if (!bestDefault) {
+      console.warn("⚠️ Nenhum default baseado em atributo encontrado, usando DX-4 como fallback");
+      return { baseAttribute: 'dx', modifier: -4 };
+    }
+
+    console.log(`🎯 Melhor default encontrado: ${bestDefault.baseAttribute.toUpperCase()}${bestDefault.modifier >= 0 ? '+' : ''}${bestDefault.modifier}`);
+    return bestDefault;
+  }
+  /**
    * Fill field with content - SIMPLIFIED
    * @param {string} textareaKey - Key for the textarea
    * @param {string} content - Content to fill
@@ -19,28 +88,38 @@ class MookinatorFormOperations {
   /**
    * Fill attributes with calculated values - UPDATED WITH PARRY AND SHIELD LOGIC AND CORRECTED HP/FP FORMULAS
    * @param {Object} config - Configuration object with min/max values
+   * @param {Object} gcsBaseAttributes - Base attribute values from GCS file
    */
-  preencherAtributos(config) {
+  preencherAtributos(config, gcsBaseAttributes = null) {
     const mookApp = Object.values(ui.windows).find(w => w.title?.includes("Mook Generator"));
     if (!mookApp) return;
-
-    console.log("🎯 Iniciando preenchimento de atributos com nova lógica...");
 
     const mookinator = game.modules.get("mookinator").api;
 
     // Object to store all calculated attributes
     const calculatedAttributes = {};
 
-    // Step 1: Calculate base attributes first (ST, DX, IQ, HT, PARRY)
+    // Step 1: Calculate base attributes first (ST, DX, IQ, HT with base values + modifiers, PARRY as random)
     const baseAttributes = {};
     
-    // Calculate ST, DX, IQ, HT, PARRY as random values within their ranges
-    ['st', 'dx', 'iq', 'ht', 'parry'].forEach(attr => {
+    // Calculate ST, DX, IQ, HT with base values from imported file + random modifiers
+    ['st', 'dx', 'iq', 'ht'].forEach(attr => {
       const minValue = config.atributos?.[attr]?.min ?? config[attr + 'Min'];
       const maxValue = config.atributos?.[attr]?.max ?? config[attr + 'Max'];
       
+      // PRIORITY 1: Use GCS base values if available
+      // PRIORITY 2: Use config base values if available  
+      // PRIORITY 3: Default to 10
+      let baseValue = 10;
+      if (gcsBaseAttributes && gcsBaseAttributes[attr] && typeof gcsBaseAttributes[attr].baseValue === 'number') {
+        baseValue = gcsBaseAttributes[attr].baseValue;
+      } else if (config.atributos?.[attr]?.baseValue && typeof config.atributos[attr].baseValue === 'number') {
+        baseValue = config.atributos[attr].baseValue;
+      }
+      
       if (typeof minValue === "number" && typeof maxValue === "number" && maxValue >= minValue) {
-        const val = mookinator.utils.randomInt(minValue, maxValue);
+        const modifier = mookinator.utils.randomInt(minValue, maxValue);
+        const val = baseValue + modifier;
         baseAttributes[attr] = val;
         calculatedAttributes[attr] = val;
         
@@ -50,8 +129,18 @@ class MookinatorFormOperations {
         
         // Set the calculated value
         mookApp.element.find(`input[data-key="${attr}"]`).val(val).trigger("change");
-        
-        console.log(`📊 ${attr.toUpperCase()}: ${val}`);
+      }
+    });
+    
+    // Calculate PARRY as pure random value (no base value from file)
+    ['parry'].forEach(attr => {
+      const minValue = config.atributos?.[attr]?.min ?? config[attr + 'Min'];
+      const maxValue = config.atributos?.[attr]?.max ?? config[attr + 'Max'];
+      
+      if (typeof minValue === "number" && typeof maxValue === "number" && maxValue >= minValue) {
+        const val = mookinator.utils.randomInt(minValue, maxValue);
+        baseAttributes[attr] = val;
+        calculatedAttributes[attr] = val;
       }
     });
 
@@ -66,8 +155,6 @@ class MookinatorFormOperations {
       mookApp.element.find(`input[name="hpMin"]`).val(config.atributos.hp.min);
       mookApp.element.find(`input[name="hpMax"]`).val(config.atributos.hp.max);
       mookApp.element.find(`input[data-key="hp"]`).val(hpValue).trigger("change");
-      
-      console.log(`❤️ HP: ${baseAttributes.ht} (HT) + ${hpModifier} (modifier) = ${hpValue}`);
     }
 
     // Will = IQ + random value from Will range
@@ -79,8 +166,6 @@ class MookinatorFormOperations {
       mookApp.element.find(`input[name="willMin"]`).val(config.atributos.will.min);
       mookApp.element.find(`input[name="willMax"]`).val(config.atributos.will.max);
       mookApp.element.find(`input[data-key="will"]`).val(willValue).trigger("change");
-      
-      console.log(`🧠 Will: ${baseAttributes.iq} (IQ) + ${willModifier} (modifier) = ${willValue}`);
     }
 
     // Per = IQ + random value from Per range
@@ -92,8 +177,6 @@ class MookinatorFormOperations {
       mookApp.element.find(`input[name="perMin"]`).val(config.atributos.per.min);
       mookApp.element.find(`input[name="perMax"]`).val(config.atributos.per.max);
       mookApp.element.find(`input[data-key="per"]`).val(perValue).trigger("change");
-      
-      console.log(`👁️ Per: ${baseAttributes.iq} (IQ) + ${perModifier} (modifier) = ${perValue}`);
     }
 
     // FIXED: FP = ST + random value from FP range (was HT + FP range)
@@ -105,8 +188,6 @@ class MookinatorFormOperations {
       mookApp.element.find(`input[name="fpMin"]`).val(config.atributos.fp.min);
       mookApp.element.find(`input[name="fpMax"]`).val(config.atributos.fp.max);
       mookApp.element.find(`input[data-key="fp"]`).val(fpValue).trigger("change");
-      
-      console.log(`⚡ FP: ${baseAttributes.st} (ST) + ${fpModifier} (modifier) = ${fpValue}`);
     }
 
     // UPDATED: Speed = (DX + HT) / 4 + random float from Speed range, rounded to 0.25
@@ -121,8 +202,6 @@ class MookinatorFormOperations {
       mookApp.element.find(`input[name="speedMax"]`).val(config.atributos.speed.max);
       mookApp.element.find(`input[data-key="speed"]`).val(speedValue).trigger("change");
       
-      console.log(`🏃 Speed: (${baseAttributes.dx} + ${baseAttributes.ht}) / 4 + ${speedModifier} = ${rawSpeedValue} → ${speedValue} (rounded to 0.25)`);
-      
       // UPDATED: Move = floor(Speed) + random value from Move range
       let moveValue = Math.floor(speedValue);
       
@@ -134,14 +213,10 @@ class MookinatorFormOperations {
         // Update min/max fields in form
         mookApp.element.find(`input[name="moveMin"]`).val(config.atributos.move.min);
         mookApp.element.find(`input[name="moveMax"]`).val(config.atributos.move.max);
-        
-        console.log(`🚶 Move: floor(${speedValue}) + ${moveModifier} (random modifier) = ${moveValue}`);
       } else {
         // Fallback to old behavior if no Move range is configured
         mookApp.element.find(`input[name="moveMin"]`).val(0);
         mookApp.element.find(`input[name="moveMax"]`).val(0);
-        
-        console.log(`🚶 Move: floor(${speedValue}) = ${moveValue} (no random modifier configured)`);
       }
       
       calculatedAttributes.move = moveValue;
@@ -153,8 +228,6 @@ class MookinatorFormOperations {
       mookApp.element.find(`input[name="dodgeMin"]`).val(config.atributos?.dodge?.min || 0);
       mookApp.element.find(`input[name="dodgeMax"]`).val(config.atributos?.dodge?.max || 0);
       mookApp.element.find(`input[data-key="dodge"]`).val(dodgeValue).trigger("change");
-      
-      console.log(`🤸 Dodge: ${moveValue} (Move) + 3 = ${dodgeValue} (DB bonus will be added later)`);
     }
 
     // UPDATED: Shield - random value from range (like all other independent attributes)
@@ -165,8 +238,6 @@ class MookinatorFormOperations {
       mookApp.element.find(`input[name="shieldMin"]`).val(config.atributos.shield.min);
       mookApp.element.find(`input[name="shieldMax"]`).val(config.atributos.shield.max);
       mookApp.element.find(`input[data-key="shield"]`).val(shieldValue).trigger("change");
-      
-      console.log(`🛡️ Shield: ${shieldValue}`);
     }
 
     // Step 3: Handle remaining attributes that don't change calculation (dr)
@@ -185,8 +256,6 @@ class MookinatorFormOperations {
         mookApp.element.find(`input[name="${attr}Max"]`).val(maxValue);
         
         mookApp.element.find(`input[data-key="${attr}"]`).val(val).trigger("change");
-        
-        console.log(`📊 ${attr.toUpperCase()}: ${val}`);
       }
     });
 
@@ -199,11 +268,8 @@ class MookinatorFormOperations {
       mookApp.element.find(`input[name="coinsMax"]`).val(config.atributos.coins.max);
       
       const currentData = mookinator.state.getCurrentMookData();
-      console.log("🪙 Processando moedas - Valor:", coinsValue, "Dados de moeda disponíveis:", currentData.mookData?.currency);
       const coinDistribution = mookinator.utils.distributeCoins(coinsValue, currentData.mookData?.currency);
       this.preencherCampo("equipment", coinDistribution);
-      
-      console.log(`🪙 COINS: ${coinsValue}`);
     }
 
     // Step 5: Handle SM separately (it might have different logic)
@@ -214,14 +280,10 @@ class MookinatorFormOperations {
       mookApp.element.find(`input[name="smMin"]`).val(config.atributos.sm.min);
       mookApp.element.find(`input[name="smMax"]`).val(config.atributos.sm.max);
       mookApp.element.find(`input[data-key="sm"]`).val(smValue).trigger("change");
-      
-      console.log(`📏 SM: ${smValue}`);
     }
 
     // CRITICAL: Store all calculated attributes in module state
     mookinator.state.setLastCalculatedAttributes(calculatedAttributes);
-
-    console.log("✅ Preenchimento de atributos concluído com nova lógica!");
   }
 
   /**
@@ -256,8 +318,6 @@ class MookinatorFormOperations {
 
     // Special handling for shields
     if (weapon.shield === true) {
-      console.log(`🛡️ Formatando escudo: ${weapon.nome} com DB ${weapon.db} e Shield Attribute ${shieldAttributeValue}`);
-      
       return weapon.attacks.map(attack => {
         // For shields, check if we have inferredBaseDamageType for ST-based damage
         let damageStr = attack.dano;
@@ -278,8 +338,6 @@ class MookinatorFormOperations {
           if (damageResults.length > 0) {
             damageStr = `${damageResults[0].damage} ${damageResults[0].type}`;
           }
-          
-          console.log(`🛡️ Escudo ${weapon.nome}: Tipo de dano extraído "${realDamageType}" de "${attack.dano}"`);
         }
         
         if (!damageStr || damageStr === 'N/A') {
@@ -301,10 +359,6 @@ class MookinatorFormOperations {
         if (weapon.db !== null && weapon.db > 0) {
           const calculatedBlock = Math.floor(nivel / 2) + 3 + weapon.db + shieldAttributeValue;
           properties.push(`block ${calculatedBlock}`);
-          
-          console.log(`🛡️ Block calculado para ${weapon.nome}: floor(${nivel} / 2) + 3 + ${weapon.db} + ${shieldAttributeValue} = ${calculatedBlock}`);
-        } else {
-          console.log(`🛡️ AVISO: Escudo ${weapon.nome} não possui DB válido (db=${weapon.db}), block não será calculado`);
         }
         
         if (properties.length > 0) {
@@ -336,8 +390,6 @@ class MookinatorFormOperations {
         if (damageResults.length > 0) {
           damageStr = `${damageResults[0].damage} ${damageResults[0].type}`;
         }
-        
-        console.log(`⚔️ Arma ${weapon.nome}: Tipo de dano extraído "${realDamageType}" de "${attack.dano}"`);
       }
       
       if (!damageStr || damageStr === 'N/A') {
@@ -359,8 +411,6 @@ class MookinatorFormOperations {
       if (attack.parry) {
         const calculatedParry = mookinator.utils.calculateParryValue(nivel, attack.parry, shieldDbBonusForParry);
         properties.splice(-1, 0, `parry ${calculatedParry}`); // Insert parry before block if block exists
-        
-        console.log(`⚔️ Parry calculado para ${weapon.nome}: floor(${nivel} / 2) + 3 + parry(${attack.parry}) + DB(${shieldDbBonusForParry}) = ${calculatedParry}`);
       }
       
       if (properties.length > 0) {
@@ -399,8 +449,6 @@ class MookinatorFormOperations {
       if (damageResults.length > 0) {
         damageStr = `${damageResults[0].damage} ${damageResults[0].type}`;
       }
-      
-      console.log(`🏹 Arma à distância ${weapon.nome}: Tipo de dano extraído "${realDamageType}" de "${weapon.dano}"`);
     }
     
     if (!damageStr || damageStr.trim() === '' || damageStr === 'N/A') {
@@ -444,98 +492,218 @@ class MookinatorFormOperations {
     const usados = new Set();
     const escolhidos = [];
     
-    // Special handling for melee weapons to guarantee at least one shield
-    if (key === 'melee') {
-      console.log("🛡️ Processando armas corpo a corpo com garantia de escudo...");
-      
-      // Separate shields from regular weapons
-      const shields = lista.filter(item => item.shield === true);
-      const regularWeapons = lista.filter(item => item.shield !== true);
-      
-      console.log(`🛡️ Encontrados ${shields.length} escudos e ${regularWeapons.length} armas regulares`);
-      
-      // If we have shields, guarantee at least one (but only if it has valid DB)
-      if (shields.length > 0) {
-        // Filter shields to only include those with valid DB (not null)
-        const validShields = shields.filter(shield => shield.db !== null && shield.db > 0);
-        
-        if (validShields.length > 0) {
-          const randomShieldIndex = Math.floor(Math.random() * validShields.length);
-          const selectedShield = validShields[randomShieldIndex];
-          const nivel = Math.floor(Math.random() * (config.max - config.min + 1)) + config.min;
+    // NEW: First, add all mandatory items
+    const mandatoryItems = lista.filter(item => item.isMandatory === true);
+    
+    if (mandatoryItems.length > 0) {
+      mandatoryItems.forEach((item, index) => {
+        const originalIndex = lista.findIndex(listItem => listItem === item);
+        if (originalIndex !== -1) {
+          usados.add(originalIndex);
           
-          // CRITICAL: Store the selected shield's DB value globally
-          const selectedShieldDb = selectedShield.db;
-          mookinator.state.setShieldDbBonus(selectedShieldDb);
-          
-          const formattedShields = this.formatMeleeWeapon(selectedShield, nivel, st, shieldAttributeValue, selectedShieldDb);
-          escolhidos.push(...formattedShields);
-          
-          console.log(`🛡️ Escudo garantido adicionado: ${selectedShield.nome}(${nivel}) com DB ${selectedShieldDb}`);
-          
-          // Mark this shield as used by finding its index in the original list
-          const originalShieldIndex = lista.findIndex(item => item === selectedShield);
-          if (originalShieldIndex !== -1) {
-            usados.add(originalShieldIndex);
-          }
-        } else {
-          console.log(`🛡️ AVISO: Nenhum escudo com DB válido encontrado. Escudos disponíveis:`, shields.map(s => `${s.nome} (DB: ${s.db})`));
-          // Reset shield DB bonus since no valid shield was selected
-          mookinator.state.setShieldDbBonus(0);
-        }
-      } else {
-        // Reset shield DB bonus since no shields are available
-        mookinator.state.setShieldDbBonus(0);
-      }
-      
-      // Fill remaining slots with random weapons (shields or regular) - all get the DB bonus for parry
-      const shieldDbBonusForParry = mookinator.state.getShieldDbBonus();
-      while (escolhidos.length < config.qty && usados.size < lista.length) {
-        const idx = Math.floor(Math.random() * lista.length);
-        if (!usados.has(idx)) {
-          usados.add(idx);
-          const item = lista[idx];
-          const nivel = Math.floor(Math.random() * (config.max - config.min + 1)) + config.min;
-          
-          const formattedWeapons = this.formatMeleeWeapon(item, nivel, st, shieldAttributeValue, shieldDbBonusForParry);
-          escolhidos.push(...formattedWeapons);
-        }
-      }
-    } else {
-      // UPDATED: Special handling for skills to guarantee "shield" skill if present
-      if (key === 'skills') {
-        console.log("🛡️ Processando skills com garantia de skill 'shield'...");
-        
-        // Look for a skill named "shield" (case-insensitive)
-        const shieldSkillIndex = lista.findIndex(item => 
-          item.nome && item.nome.toLowerCase() === 'shield'
-        );
-        
-        if (shieldSkillIndex !== -1) {
-          const shieldSkill = lista[shieldSkillIndex];
-          const nivel = Math.floor(Math.random() * (config.max - config.min + 1)) + config.min;
-          
-          escolhidos.push(`${shieldSkill.nome}-${nivel}`);
-          usados.add(shieldSkillIndex);
-          
-          console.log(`🛡️ Skill 'shield' garantida adicionada: ${shieldSkill.nome}-${nivel}`);
-        }
-      }
-      
-      // Regular handling for other skill types (skills, spells, ranged)
-      while (escolhidos.length < config.qty && usados.size < lista.length) {
-        const idx = Math.floor(Math.random() * lista.length);
-        if (!usados.has(idx)) {
-          usados.add(idx);
-          const item = lista[idx];
-          const nivel = Math.floor(Math.random() * (config.max - config.min + 1)) + config.min;
-          
-          if (key === 'ranged') {
+          if (key === 'melee') {
+            // Calculate weapon skill level using best default
+            let nivel;
+            if (item.attacks && item.attacks[0] && item.attacks[0].defaults && Array.isArray(item.attacks[0].defaults) && item.attacks[0].defaults.length > 0) {
+              const bestDefault = this.findBestWeaponDefault(item.attacks[0].defaults);
+              const finalAttributeValue = mookinator.state.getCalculatedAttributeValue(bestDefault.baseAttribute);
+              
+              if (finalAttributeValue > 0) {
+                const randomVariation = mookinator.utils.randomInt(config.min, config.max);
+                nivel = finalAttributeValue + randomVariation;
+              } else {
+                nivel = mookinator.utils.randomInt(config.min, config.max);
+                console.warn(`⚠️ Atributo ${bestDefault.baseAttribute} não encontrado para arma obrigatória ${item.nome}, usando nível aleatório`);
+              }
+            } else {
+              nivel = mookinator.utils.randomInt(config.min, config.max);
+              console.warn(`⚠️ Nenhum default encontrado para arma obrigatória ${item.nome}, usando nível aleatório`);
+            }
+            
+            // Check if this is a shield and store DB bonus
+            if (item.shield === true && item.db !== null && item.db > 0) {
+              mookinator.state.setShieldDbBonus(item.db);
+            }
+            
+            const shieldDbBonusForParry = mookinator.state.getShieldDbBonus();
+            const formattedWeapons = this.formatMeleeWeapon(item, nivel, st, shieldAttributeValue, shieldDbBonusForParry);
+            escolhidos.push(...formattedWeapons);
+            
+          } else if (key === 'ranged') {
+            // Calculate ranged weapon skill level using weapon defaults
+            let nivel;
+            if (item.defaults && Array.isArray(item.defaults) && item.defaults.length > 0) {
+              const bestDefault = this.findBestWeaponDefault(item.defaults);
+              const finalAttributeValue = mookinator.state.getCalculatedAttributeValue(bestDefault.baseAttribute);
+              
+              if (finalAttributeValue > 0) {
+                const randomVariation = mookinator.utils.randomInt(config.min, config.max);
+                nivel = finalAttributeValue + randomVariation;
+              } else {
+                nivel = mookinator.utils.randomInt(config.min, config.max);
+                console.warn(`⚠️ Atributo ${bestDefault.baseAttribute} não encontrado para arma à distância obrigatória ${item.nome}, usando nível aleatório`);
+              }
+            } else {
+              nivel = mookinator.utils.randomInt(config.min, config.max);
+              console.warn(`⚠️ Nenhum default encontrado para arma à distância obrigatória ${item.nome}, usando nível aleatório`);
+            }
+            
             const formattedWeapon = this.formatRangedWeapon(item, nivel, st);
             escolhidos.push(formattedWeapon);
-          } else if (key === 'skills' || key === 'spells') {
-            escolhidos.push(`${item.nome}-${nivel}`);
+            
+          } else if (key === 'skills') {
+            // Calculate skill level based on difficulty if available
+            let finalLevel;
+            
+            if (item.difficulty) {
+              const parsed = this.parseDifficulty(item.difficulty);
+              
+              if (parsed.baseAttribute) {
+                const baseAttributeValue = mookinator.state.getCalculatedAttributeValue(parsed.baseAttribute);
+                
+                if (baseAttributeValue > 0) {
+                  const randomVariation = mookinator.utils.randomInt(config.min, config.max);
+                  finalLevel = baseAttributeValue + parsed.modifier + randomVariation;
+                } else {
+                  finalLevel = mookinator.utils.randomInt(config.min, config.max);
+                  console.warn(`⚠️ Atributo ${parsed.baseAttribute} não encontrado para skill obrigatória ${item.nome}, usando nível aleatório`);
+                }
+              } else {
+                finalLevel = mookinator.utils.randomInt(config.min, config.max);
+              }
+            } else {
+              finalLevel = mookinator.utils.randomInt(config.min, config.max);
+            }
+            
+            escolhidos.push(`${item.nome}-${finalLevel}`);
+            
+          } else if (key === 'spells') {
+            // Calculate spell level based on IQ + random variation (consistent with random spells)
+            let finalLevel;
+            
+            const baseIqValue = mookinator.state.getCalculatedAttributeValue('iq');
+            
+            if (baseIqValue > 0) {
+              const randomVariation = mookinator.utils.randomInt(config.min, config.max);
+              finalLevel = baseIqValue + randomVariation;
+            } else {
+              finalLevel = mookinator.utils.randomInt(config.min, config.max);
+              console.warn(`⚠️ Atributo IQ não encontrado para spell obrigatória ${item.nome}, usando nível aleatório`);
+            }
+            
+            escolhidos.push(`${item.nome}-${finalLevel}`);
           }
+          
+        }
+      });
+    }
+    
+    // Reset shield DB bonus if no mandatory shield was found
+    if (key === 'melee' && !mandatoryItems.some(item => item.shield === true && item.db !== null && item.db > 0)) {
+      mookinator.state.setShieldDbBonus(0);
+    }
+    
+    // Get current shield DB bonus for parry calculations
+    const shieldDbBonusForParry = mookinator.state.getShieldDbBonus();
+    
+    // NEW: Then fill remaining slots with random items
+    while (escolhidos.length < config.qty && usados.size < lista.length) {
+      const idx = Math.floor(Math.random() * lista.length);
+      if (!usados.has(idx)) {
+        usados.add(idx);
+        const item = lista[idx];
+        
+        if (key === 'melee') {
+          // Calculate weapon skill level using best default
+          let nivel;
+          if (item.attacks && item.attacks[0] && item.attacks[0].defaults && Array.isArray(item.attacks[0].defaults) && item.attacks[0].defaults.length > 0) {
+            const bestDefault = this.findBestWeaponDefault(item.attacks[0].defaults);
+            const finalAttributeValue = mookinator.state.getCalculatedAttributeValue(bestDefault.baseAttribute);
+            
+            if (finalAttributeValue > 0) {
+              const randomVariation = mookinator.utils.randomInt(config.min, config.max);
+              nivel = finalAttributeValue + randomVariation;
+            } else {
+              nivel = mookinator.utils.randomInt(config.min, config.max);
+              console.warn(`⚠️ Atributo ${bestDefault.baseAttribute} não encontrado para arma ${item.nome}, usando nível aleatório`);
+            }
+          } else {
+            nivel = mookinator.utils.randomInt(config.min, config.max);
+            console.warn(`⚠️ Nenhum default encontrado para arma ${item.nome}, usando nível aleatório`);
+          }
+          
+          // Check if this is a shield and update DB bonus (only if no mandatory shield was already selected)
+          if (item.shield === true && item.db !== null && item.db > 0 && mookinator.state.getShieldDbBonus() === 0) {
+            mookinator.state.setShieldDbBonus(item.db);
+          }
+          
+          const currentShieldDbBonusForParry = mookinator.state.getShieldDbBonus();
+          const formattedWeapons = this.formatMeleeWeapon(item, nivel, st, shieldAttributeValue, currentShieldDbBonusForParry);
+          escolhidos.push(...formattedWeapons);
+          
+        } else if (key === 'ranged') {
+          // Calculate ranged weapon skill level using weapon defaults
+          let nivel;
+          if (item.defaults && Array.isArray(item.defaults) && item.defaults.length > 0) {
+            const bestDefault = this.findBestWeaponDefault(item.defaults);
+            const finalAttributeValue = mookinator.state.getCalculatedAttributeValue(bestDefault.baseAttribute);
+            
+            if (finalAttributeValue > 0) {
+              const randomVariation = mookinator.utils.randomInt(config.min, config.max);
+              nivel = finalAttributeValue + randomVariation;
+            } else {
+              nivel = mookinator.utils.randomInt(config.min, config.max);
+              console.warn(`⚠️ Atributo ${bestDefault.baseAttribute} não encontrado para arma à distância ${item.nome}, usando nível aleatório`);
+            }
+          } else {
+            nivel = mookinator.utils.randomInt(config.min, config.max);
+            console.warn(`⚠️ Nenhum default encontrado para arma à distância ${item.nome}, usando nível aleatório`);
+          }
+          
+          const formattedWeapon = this.formatRangedWeapon(item, nivel, st);
+          escolhidos.push(formattedWeapon);
+          
+        } else if (key === 'skills') {
+          // Calculate skill level based on difficulty if available
+          let finalLevel;
+          
+          if (item.difficulty) {
+            const parsed = this.parseDifficulty(item.difficulty);
+            
+            if (parsed.baseAttribute) {
+              const baseAttributeValue = mookinator.state.getCalculatedAttributeValue(parsed.baseAttribute);
+              
+              if (baseAttributeValue > 0) {
+                const randomVariation = mookinator.utils.randomInt(config.min, config.max);
+                finalLevel = baseAttributeValue + parsed.modifier + randomVariation;
+              } else {
+                finalLevel = mookinator.utils.randomInt(config.min, config.max);
+                console.warn(`⚠️ Atributo ${parsed.baseAttribute} não encontrado para skill ${item.nome}, usando nível aleatório`);
+              }
+            } else {
+              finalLevel = mookinator.utils.randomInt(config.min, config.max);
+            }
+          } else {
+            finalLevel = mookinator.utils.randomInt(config.min, config.max);
+          }
+          
+          escolhidos.push(`${item.nome}-${finalLevel}`);
+          
+        } else if (key === 'spells') {
+          // Calculate spell level based on IQ + random variation
+          let finalLevel;
+          
+          const baseIqValue = mookinator.state.getCalculatedAttributeValue('iq');
+          
+          if (baseIqValue > 0) {
+            const randomVariation = mookinator.utils.randomInt(config.min, config.max);
+            finalLevel = baseIqValue + randomVariation;
+          } else {
+            finalLevel = mookinator.utils.randomInt(config.min, config.max);
+            console.warn(`⚠️ Atributo IQ não encontrado para spell ${item.nome}, usando nível aleatório`);
+          }
+          
+          escolhidos.push(`${item.nome}-${finalLevel}`);
         }
       }
     }
