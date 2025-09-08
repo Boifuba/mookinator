@@ -77,6 +77,10 @@ Join us on [Discord](https://discord.gg/223PjGAM2Y), or create an [issue](https:
 
 ## Do want to support me ? 
 
-Buy me a [coffee](https://github.com/sponsors/Boifuba)
+### Support the Project
 
-> The Discord is in Portuguese, but you can make your questions in English — we understand you!
+Consider supporting the project to help ongoing development.
+
+<a href="https://www.buymeacoffee.com/boifuba" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="40">
+</a>
