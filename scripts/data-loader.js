@@ -61,6 +61,15 @@ class MookinatorDataLoader {
   }
 
   /**
+   * Check if weapon is ranged based on tags
+   * @param {Array} tags - Equipment tags array
+   * @returns {boolean} True if weapon is ranged
+   */
+  isRangedWeapon(tags) {
+    return tags && tags.includes('Missile Weapon');
+  }
+
+  /**
    * Helper function to find maximum positive amount from features array
    * @param {Array} features - Features array to search
    * @returns {number} Maximum positive amount found or 0
@@ -93,9 +102,9 @@ class MookinatorDataLoader {
   }
 
   /**
-   * Extract shield DB value from equipment - FIXED TO SEARCH IN CORRECT LOCATION
+   * Extract shield DB value from equipment
    * @param {Object} equip - Equipment object
-   * @returns {number} Shield DB value or 0
+   * @returns {number} Shield DB value or 0 if not found
    */
   extractShieldDB(equip) {
     // PRIORITY 1: Look for DB in equip.features array (where it actually is in the JSON)
@@ -120,7 +129,7 @@ class MookinatorDataLoader {
       }
     }
     
-    return null; // Return null instead of 0 to indicate no valid DB found
+    return 0; // Return 0 for consistency with other numeric return values
   }
 
   /**
@@ -324,10 +333,10 @@ class MookinatorDataLoader {
                 const extractedDb = this.extractShieldDB(equip);
                 newMeleeSkill.db = extractedDb;
                 
-                if (extractedDb !== null && extractedDb > 0) {
+                if (extractedDb > 0) {
                   console.log(`🛡️ Escudo ${equip.description} processado com DB: ${extractedDb}`);
                 } else {
-                  console.log(`🛡️ ERRO ao extrair DB do escudo ${equip.description}: DB inválido (${extractedDb})`);
+                  console.log(`🛡️ Escudo ${equip.description} não possui DB válido (${extractedDb})`);
                 }
               }
 

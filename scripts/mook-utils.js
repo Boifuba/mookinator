@@ -161,11 +161,14 @@ class MookinatorUtils {
       let quantity = 0;
       
       if (isLastCurrency) {
+        // Last currency takes all remaining value
         quantity = Math.floor(remainingValue / currency.cost);
       } else {
         const maxQuantity = Math.floor(remainingValue / currency.cost);
         if (maxQuantity > 0) {
-          quantity = Math.random() < 0.3 ? 0 : Math.floor(Math.random() * Math.min(maxQuantity + 1, 10));
+          // Use 50% to 100% of available quantity for more balanced distribution
+          const minQuantity = Math.floor(maxQuantity * 0.5);
+          quantity = Math.floor(Math.random() * (maxQuantity - minQuantity + 1)) + minQuantity;
         }
       }
 
